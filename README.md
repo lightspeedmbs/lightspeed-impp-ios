@@ -1,2 +1,2 @@
 # lightspeed-impp-ios
-A complete open source instance messenger that powered by Lightspeed open communication platform. 
+A complete open source instant messenger powered by Lightspeed open communication platform. 
