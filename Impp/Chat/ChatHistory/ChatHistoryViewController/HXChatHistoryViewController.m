@@ -81,7 +81,7 @@
     [self.searchBar setShowsCancelButton:NO];
     self.searchBar.delegate = self;
     self.searchBar.tintColor = [UIColor color11];
-    self.searchBar.placeholder = NSLocalizedString(@"請輸入好友或群組名稱", nil);
+    self.searchBar.placeholder = NSLocalizedString(@"搜尋好友和群組", nil);
     
     [[UIBarButtonItem appearanceWhenContainedIn:[UISearchBar class], nil] setTitle:NSLocalizedString(@"取消", nil)];
     [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTintColor:[UIColor color2]];
@@ -267,6 +267,17 @@
         [self.tableView reloadData];
         
     });
+}
+#pragma mark - UISearchBar Delegate
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+{
+    self.searchBar.placeholder = NSLocalizedString(@"請輸入好友或群組名稱", nil);
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
+{
+    self.searchBar.placeholder = NSLocalizedString(@"搜尋好友和群組", nil);
 }
 
 #pragma mark - UISearchDisplayDelegate

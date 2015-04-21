@@ -144,7 +144,7 @@
     self.headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0,SCREEN_WIDTH , 104)];
     self.headerView.backgroundColor = [UIColor color1];
     
-    self.photoImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"default_200"]];
+    self.photoImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"friend_default"]];
     self.photoImageView.frame = CGRectMake((SCREEN_WIDTH - 54)/2, 15, 54, 54);
     self.photoImageView.layer.cornerRadius = 54/2;
     self.photoImageView.clipsToBounds = YES;

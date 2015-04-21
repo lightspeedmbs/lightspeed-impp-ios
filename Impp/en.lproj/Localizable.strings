@@ -29,6 +29,7 @@
 
 "傳送" =	"Send";
 
+"請輸入好友或群組名稱" = "Search Friends and Groups";
 "請輸入好友名稱並按下搜尋" =	"Search by Name";
 "加入好友" =	"Add";
 "已送邀請" =	"Sent";
@@ -118,6 +119,7 @@
 "聲音訊息已傳送" = "Voice message sent";
 "位置訊息已傳送" = "Location sent";
 
+"拒絕好友請求成功" = "Rejected Friend Request";
 "發送好友請求成功" =	"Sent Friend Request";
 "好友邀請同意" =	"Accepted Friend Request";
 "收到好友邀請" =	"Received Friend Request";
@@ -129,3 +131,6 @@
 "視訊通話進行中..." =	"Video Call ...";
 
 "撰寫貼文..." =	"Say something...";
+"已讀" = "Read";
+"上午" = "AM";
+"下午" = "PM";

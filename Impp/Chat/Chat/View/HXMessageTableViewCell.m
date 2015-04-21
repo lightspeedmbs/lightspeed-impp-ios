@@ -286,9 +286,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = @"上午";
+                timeHint = NSLocalizedString(@"上午", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = @"下午";
+                timeHint = NSLocalizedString(@"下午", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -384,9 +384,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = @"上午";
+                timeHint = NSLocalizedString(@"上午", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = @"下午";
+                timeHint = NSLocalizedString(@"下午", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -405,7 +405,7 @@ profileImageUrlString:(NSString *)profileImageUrlString
         }
         
         self.readAckLabel = [[UILabel alloc] init];
-        self.readAckLabel.text = @"已讀";
+        self.readAckLabel.text = NSLocalizedString(@"已讀", nil);
         self.readAckLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:20.0f/2];
         self.readAckLabel.textColor = [HXAppUtility hexToColor:0x999999 alpha:1];
         self.readAckLabel.numberOfLines = 1;
@@ -615,9 +615,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = @"上午";
+                timeHint = NSLocalizedString(@"上午", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = @"下午";
+                timeHint = NSLocalizedString(@"下午", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -708,9 +708,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = @"上午";
+                timeHint = NSLocalizedString(@"上午", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = @"下午";
+                timeHint = NSLocalizedString(@"下午", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -725,7 +725,7 @@ profileImageUrlString:(NSString *)profileImageUrlString
         
         if (!self.readAckLabel) {
             self.readAckLabel = [[UILabel alloc] init];
-            self.readAckLabel.text = @"已讀";
+            self.readAckLabel.text = NSLocalizedString(@"已讀", nil);
             self.readAckLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:20.0f/2];
             self.readAckLabel.textColor = [HXAppUtility hexToColor:0x999999 alpha:1];
             self.readAckLabel.numberOfLines = 1;

@@ -93,7 +93,7 @@
      Profile photo
      */
     
-    self.profilePhoto = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"default_photo"]];
+    self.profilePhoto = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"friend_default"]];
     self.profilePhoto.frame = CGRectMake(15 ,
                                          21,
                                          36, 36);
@@ -135,21 +135,7 @@
     self.nameLabel.textAlignment = NSTextAlignmentLeft;
     self.nameLabel.numberOfLines = 1;
     [self.contentView addSubview:self.nameLabel];
-    
 
-    
-    /*
-     location label
-     */
-    self.locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(100/2, 58/2, 500/2, 24/2)];
-    self.locationLabel.backgroundColor = [UIColor clearColor];
-    self.locationLabel.text = self.postInfo[@"customFields"][@"location"] ? self.postInfo[@"customFields"][@"location"] : @"";
-    self.locationLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:24.0f/2];
-    self.locationLabel.textColor = [HXAppUtility hexToColor:0x999999 alpha:1];
-    self.locationLabel.textAlignment = NSTextAlignmentLeft;
-    self.locationLabel.numberOfLines = 0;
-    [self.locationLabel sizeToFit];
-    [self.contentView addSubview:self.locationLabel];
     
     
     /*

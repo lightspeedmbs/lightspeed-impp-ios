@@ -201,7 +201,9 @@
     
     [[HXAnSocialManager manager]sendRequest:@"friends/requests/reject.json" method:AnSocialManagerPOST params:params success:^(NSDictionary* response){
         NSLog(@"success log: %@",[response description]);
-        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.view makeImppToast:NSLocalizedString(@"拒絕好友請求成功", nil) navigationBarHeight:64];
+        });
         
     } failure:^(NSDictionary* response){
         
