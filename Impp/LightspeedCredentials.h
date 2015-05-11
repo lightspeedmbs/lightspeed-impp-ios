@@ -9,6 +9,6 @@
 #ifndef IMChat_LightspeedCredentials_h
 #define IMChat_LightspeedCredentials_h
 
-#define LIGHTSPEED_APP_KEY @""
+#define LIGHTSPEED_APP_KEY @"" 
 #define LIGHTSPEED_WALL_ID @""
 #endif

@@ -12,7 +12,10 @@
 #import "LightspeedCredentials.h"
 #import "UIColor+CustomColor.h"
 #import "MessageUtil.h"
+#import "UserUtil.h"
 #import "HXIMManager.h"
+#import "HXUserAccountManager.h"
+#import "HXTabBarViewController.h"
 
 @interface AppDelegate () <AnPushDelegate>
 
@@ -39,6 +42,17 @@
                                              selector:@selector(registerPushNotification)
                                                  name:@"connect"
                                                object:nil];
+    
+    NSDictionary *lastUsed = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"lastLoggedInUser"];
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
+                                                             bundle: nil];
+    if (lastUsed) {
+        [HXUserAccountManager manager].userInfo = [UserUtil getHXUserByUserId:lastUsed[@"userId"]];
+        [[HXUserAccountManager manager] userSignedInWithId:lastUsed[@"userId"] name:lastUsed[@"userName"] clientId:lastUsed[@"clientId"]];
+        HXTabBarViewController *vc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
+        
+        self.window.rootViewController = vc;
+    }
     
     return YES;
 }

@@ -411,7 +411,11 @@
 
     [self addTimeMessageWithTimestamp:timestamp];
     [self.messagesArray addObject:customMessage];
-    [[[HXIMManager manager]anIM] sendReadACK:messageId toClients:[NSSet setWithObject:from]];
+    
+    if (!self.isTopicMode) {
+        [[[HXIMManager manager]anIM] sendReadACK:messageId toClients:[NSSet setWithObject:from]];
+    }
+    
     
     [self.readMsgSet addObject:messageId];
     
@@ -441,7 +445,11 @@
     
     [self addTimeMessageWithTimestamp:timestamp];
     [self.messagesArray addObject:customMessage];
-    [[[HXIMManager manager]anIM] sendReadACK:messageId toClients:[NSSet setWithObject:from]];
+    
+    if (!self.isTopicMode) {
+        [[[HXIMManager manager]anIM] sendReadACK:messageId toClients:[NSSet setWithObject:from]];
+    }
+    
     
     [self.readMsgSet addObject:messageId];
     
@@ -471,7 +479,11 @@
         /* send read ACK */
         if (![message.from isEqualToString:self.chatInfo.currentClientId] && ![message.readACK integerValue]) {
             [MessageUtil updateMessageReadAckByMessageId:message.msgId];
-            [[[HXIMManager manager]anIM] sendReadACK:message.msgId toClients:[NSSet setWithObject:message.from]];
+            
+            if(!self.isTopicMode){
+              [[[HXIMManager manager]anIM] sendReadACK:message.msgId toClients:[NSSet setWithObject:message.from]];
+            }
+            
         }
         
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
