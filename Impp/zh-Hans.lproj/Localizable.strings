@@ -5,130 +5,172 @@
   Created by Herxun on 2015/4/14.
   Copyright (c) 2015年 hsujahhu. All rights reserved.
 */
+"%@_send_you_a_friend_request" = "%@ 向您提出好友请求。";
+"%@_is_now_your_friend" = "%@ 已跟您成为好友。";
 
-"聊天" =	"聊天";
-"好友" =	"好友";
-"發現" =	"发现";
-"設定" =	"设置";
+"welcome_message_from_default_user" =	"你好! 我是箭扣科技Arrownock的小艾, 欢迎使用IM++ 😊";
 
-"用戶名稱" =	"用户名称";
-"密碼" =	"密码";
-"註冊" =	"注册";
-"登入" =	"登录";
-"您的用戶名稱必須是大小寫的英文字母" =	"您的用户名称必须是大小写的英文字母";
+"%@_reply_%@" = "%@ 回应 %@";
+"no_friend_request" = "目前还没有好友请求";
+"no_chat_history" = "目前没有聊天信息";
+"no_rooms_yet" = "目前还没有圈子，赶快去创建一个吧：）";
 
-"搜尋好友和群組" =	"搜寻好友和群组";
-"好友請求" =	"好友请求";
-"群組列表" =	"群组列表";
-"好友列表" =	"好友列表";
-"加入新好友" =	"加入新好友";
-"新增群組聊天" =	"新增群组聊天";
+"kicked" = "您已经在另一台设备上登入此帐号，现在将会被自动登出.";
+"ok"  = "好";
+"we_media" = "自媒圈";
+"announcement" = "公告圈";
+//"explore_friends" = "好友圈";
+"room_name_description_photo_are_mandatory" = "名称、简介和封面图片皆为必填";
+"leave_room" = "离开";
+"leave_group" = "退出群组";
+"send_chat_message" = "发送信息";
+"no_result" = "沒有結果";
+"chat" =	"聊天圈";
+"chat_tab" = "聊天";
+"friends" =	"好友";
+"discover" =	"交响圈";
+"settings" =	"设置";
 
-"群聊" =	"群聊";
-"群組" =	"群组";
+"user_name" =	"用户名";
+"password" =	"密码";
+"sign-up" =	"注册";
+"login" =	"登录";
+"alphanumeric_characters_only" =	"您的用户名称必须是英文字母";
 
-"傳送" =	"传送";
+"search_friends_and_groups" =	"搜寻好友和群组";
+"friend_request" =	"好友请求";
+"group_list" =	"我的群组";
+"friend_list" =	"我的好友";
+"add_friend" =	"加入新好友";
+"create_group_chat" =	"创建聊天群";
 
-"請輸入好友名稱並按下搜尋" =	"请输入好友名称并按下搜索";
-"加入好友" =	"加入好友";
-"已送邀請" =	"已送邀请";
-"已是好友" =	"已是好友";
+"group_chat" = "群聊" ;
+"groups" =	"群组";
+"group_name..." = "名称";
+"create_group" = "创建圈子";
+"create" = "创建";
+"group_description..." = "简介";
+"group_description" ="简介";
+//"leave" = "Leave";
+"join" = "加入";
 
-"搜尋好友名稱" =	"搜寻好友名称";
+"rooms" = "论坛圈";
 
-"返回" =	"返回";
-"接受" =	"接受";
-"拒絕" =	"拒绝";
-"已接受" =	"已接受";
-"已拒絕" =	"已拒绝";
+"send"  =	"传送";
 
-"搜尋好友和群組" =	"搜寻好友和群组";
+"Please Enter Friends Name" =	"请输入好友名称并按下搜索";
+"Add" =	"加为好友";
+"sent" =	"请求已发送";
+"already_friends" =	"已是好友";
 
-"請輸入好友或群組名稱" = "请输入好友或群组名称";
+"search_by_name" =	"搜寻好友名称";
 
-"取消" =	"取消";
+"Back" =	"返回";
+"Accept" =	"接受";
+"decline" =	"拒绝";
+"Accepted" =	"已接受";
+"Declined" =	"已拒绝";
 
+//"search_friends_and_groups" =	"搜寻好友和群组";
 
-"拍攝照片" =	"拍摄照片";
-"選取照片" =	"选择照片";
-"傳送位置" = "目前位置";
-"錄製聲音" =	"录制声音";
-"語音通話" =	"语音通话";
-"視訊通話" =	"视频通话";
+"please_enter_friends_and_groups_name" = "请输入好友或群组名称";
 
-
-"重新拍攝" =	"重拍";
-"使用照片" =	"使用照片";
-
-"按住即可錄音" =	"按住即可录音";
-"錄音中" =	"录音中";
-"放開即可傳送" =	"放开即可送出";
-"取消" =	"取消";
-"聲音訊息過短" =	"声音信息过短";
-"放開以取消傳送" =	"放开以取消送出";
-
-"靜音" =	"静音";
-"掛斷" =	"挂断";
-"取消靜音" =	"取消静音";
-
-"語音通話" =	"语音通话";
-
-"接聽" =	"接听";
-
-
-"關閉鏡頭" =	"关闭镜头";
-"開啟鏡頭" =	"开启镜头";
-"視訊通話" =	"视频通话";
+"Cancel" =	"取消";
 
 
-"編輯" =	"编辑";
-"編輯群組名稱" =	"编辑群组名称";
-"邀請成員" =	"邀请成员";
-"退出群組" =	"退出群组";
-"取消" =	"取消";
+"camera" =	"拍摄照片";
+"choose_a_photo" =	"选择照片";
+"location" = "目前位置";
+"voice_message" =	"录制声音";
+"call" =	"语音通话";
+"video_call" =	"视频通话";
 
-"編輯群組名稱" =	"编辑群组名称";
-"請輸入這個群組的名稱" =	"请输入这个群组的名称";
-"取消" =	"取消";
-"儲存" =	"储存";
 
-"確認" =	"确认";
+"retake" =	"重拍";
+"use_photo" =	"使用相片";
 
-"刪除並解散群組" =	"删除并解散群组";
+"press_to_record_message" =	"按住即可录音";
+"recording" =	"录音中";
+"release_button_to_send" =	"放开即可发送";
+"Cancel" =	"Cancel";
+"the_message_is_too_short" =	"声音信息过短";
+"release_button_to_cancel" =	"放开以取消发送";
 
-"朋友圈" =	"朋友圈";
+"mute" =	"静音";
+"end_call" =	"挂断";
+"unmute" =	"取消静音";
 
-"讚" =	"赞";
-"留言" =	"留言";
-"傳送" =	"传送";
-"查看照片" =	"查看照片";
-"新增貼文" =	"创建贴文";
-"拍攝照片" =	"拍摄照片";
-"選取照片" =	"选择照片";
+//"Call" =	"语音通话";
 
-"發佈" =	"发布";
-"登出" =	"登出";
+"accept_call" =	"接听";
 
-"%@ 向您傳送了圖片" = "%@ 向您传送了图片";
-"您收到來自 %@ 的聲音訊息" = "您收到来自 %@ 的声音信息";
-"%@ 向您傳送了位置訊息" = "%@ 向您传送了位置信息";
 
-"圖片已傳送" = "图片已送出";
-"聲音訊息已傳送" = "声音信息已送出";
-"位置訊息已傳送" = "位置信息已送出";
+"camera_off" =	"关闭镜头";
+"camera_on" =	"开启镜头";
+//"Video Call" =	"视频通话";
 
-"拒絕好友請求成功" = "拒绝好友请求成功";
-"發送好友請求成功" =	"发送好友请求成功";
-"好友邀請同意" =	"好友邀请同意";
-"收到好友邀請" =	"收到好友邀请";
 
-"正在等待對方接受邀請..." =	"正在等待对方接受邀请...";
-"語音通話來電中..." =	"语音通话来电中...";
-"語音通話進行中..." =	"语音通话进行中...";
-"視訊通話來電中..." =	"视频通话来电中...";
-"視訊通話進行中..." =	"视频通话进行中...";
+"edit" =	"编辑";
+"edit_group_name" =	"编辑群组名称";
+"invite_others" =	"邀请新成员";
+"leave" =	"退出";
+"Cancel" =	"取消";
 
-"撰寫貼文..." =	"今天的心情...";
-"已讀" = "已读";
-"上午" = "上午";
-"下午" = "下午";
+//"edit_group_name" =	"编辑群组名称";
+"enter_group_name" =	"请输入这个群组的名称";
+"Cancel" =	"取消";
+"save" =	"保存";
+
+"OK" =	"确认";
+
+"delete_group" =	"删除并解散群组";
+
+"timeline" =	"朋友圈";
+
+"like" =	"赞";
+"comment" = "评论";
+//"send"  =	"传送";
+"view_photo" =	"查看照片";
+"new_post" =	"创建贴文";
+//"camera" =	"拍摄照片";
+//"choose_a_photo" =	"选择照片";
+
+"post" =	"发布";
+"logout" =	"登出";
+
+"%@_sent_you_an_image" = "%@ 向您传送了图片";
+"%@_sent_you_a_voice_message" = "您收到来自 %@ 的声音信息";
+"%@_sent_you_a_location" = "%@ 向您传送了位置信息";
+
+"image_sent" = "图片已送出";
+"voice_message_sent" = "声音信息已送出";
+"location_sent" = "位置信息已送出";
+
+"rejected_friend_request" = "已拒绝好友请求";
+"sent_friend_request" =	"已发送好友请求";
+"accepted_friend_request" =	"好友请求已通过";
+"received_friend_request" =	"收到好友请求";
+
+"waiting..." =	"正在等待对方接受邀请...";
+"incoming_call..." =	"语音通话来电中...";
+"call_in_progress..." =	"语音通话进行中...";
+"incoming_video_call..." =	"视频通话来电中...";
+"video_call_in_progress..." =	"视频通话进行中...";
+
+"say_something..." =	"今天的心情...";
+"read" = "已读";
+"AM" = "上午";
+"PM" = "下午";
+
+//
+// 客服使用文字 *
+"customer_service_title" ="客户圈";
+"helpdesk"  = "客服圈";
+"products" = "产品介绍";
+"services" = "服务项目";
+"contact_us" = "联系我们";
+"vip_Customer_helpDesk" = "联系在线客服";
+"offline" = "离线";
+"online" = "在线";
+"vip_customer_title"= "联系在线客服";
+"no_customer_representatives" = "目前还没有可以联络的客服专员";

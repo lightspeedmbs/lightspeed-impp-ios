@@ -12,6 +12,7 @@
 @interface UserUtil : NSObject
 
 + (HXUser *)getHXUserByUserId:(NSString *)userId;
++ (HXUser *)getHXUserByUserName:(NSString *)userName;
 + (HXUser *)getHXUserByClientId:(NSString *)clientId;
 + (HXUser *)getHXUserByUserId:(NSString *)userId currentUserId:(NSString *)currentUserId;
 + (HXUser *)insertUserWithDic:(NSDictionary *)user;
@@ -26,6 +27,7 @@
 + (BOOL)checkFollowRelationshipWithCliendId:(NSString *)clientId;
 
 + (HXUser *)saveUserIntoDB:(NSDictionary *)userInfo;
++ (void)updateUser:(HXUser*)user PhotoUrl:(NSString *)photoUrl;
 + (NSDictionary *)reformUserInfoDic:(NSDictionary *)userInfo;
 + (NSString *)getUserPhotoUrlByClientId:(NSString *)clientId;
 + (void)removeTopic:(HXChat *)topic from:(NSString *)clientId;

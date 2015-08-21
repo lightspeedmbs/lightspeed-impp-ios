@@ -107,10 +107,12 @@
     
 }
 
+
+
 - (NSDictionary *)toDict
 {
-    NSDictionary* dict = @{@"userName":self.userName,
-                           @"userId":self.userId,
+    NSDictionary* dict = @{@"username":self.userName,
+                           @"id":self.userId,
                            @"clientId":self.clientId,
                            @"photoId":self.photoId,
                            @"photoURL":self.photoURL,

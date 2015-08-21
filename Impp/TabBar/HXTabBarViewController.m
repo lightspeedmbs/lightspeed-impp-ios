@@ -10,6 +10,9 @@
 #import "MessageUtil.h"
 #import "UIColor+CustomColor.h"
 #import "NotificationCenterUtil.h"
+#import "HXChatHistoryViewController.h"
+#import "HXRoomViewController.h"
+#import "HXDiscoverViewController.h"
 
 @interface HXTabBarViewController ()
 @property (strong, nonatomic) UIImageView *badge;
@@ -45,6 +48,17 @@
                                                 name:DeleteChatHistory
                                               object:nil];
     
+    [[NSNotificationCenter defaultCenter]addObserver:self
+                                            selector:@selector(updateUnreadCount)
+                                                name:ShouldUpdateTabItemBadge
+                                              object:nil];
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self
+                                            selector:@selector(refreshTabView)
+                                                name:@"loggedIn"
+                                              object:nil];
+    
+    
     [self initTabbar];
     
 }
@@ -55,9 +69,9 @@
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:bageNumber];
     
     if (bageNumber)
-        tabBarItem1.badgeValue = [NSString stringWithFormat:@"%ld",(long)bageNumber];
+        tabBarItem2.badgeValue = [NSString stringWithFormat:@"%ld",(long)bageNumber];
     else
-        tabBarItem1.badgeValue = nil;
+        tabBarItem2.badgeValue = nil;
 
 }
 
@@ -80,27 +94,29 @@
     tabBarItem3 = [tabBar.items objectAtIndex:2];
     tabBarItem4 = [tabBar.items objectAtIndex:3];
     
-    tabBarItem1.title = NSLocalizedString(@"聊天", nil);
-    [tabBarItem1 setImage:[[UIImage imageNamed:@"tab01"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
-    [tabBarItem1 setSelectedImage:[[UIImage imageNamed:@"tab01"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    tabBarItem1.title = NSLocalizedString(@"discover", nil);
+    [tabBarItem1 setImage:[[UIImage imageNamed:@"tab03"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    [tabBarItem1 setSelectedImage:[[UIImage imageNamed:@"tab03"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    
+    tabBarItem2.title = NSLocalizedString(@"chat_tab", nil);
+    [tabBarItem2 setImage:[[UIImage imageNamed:@"tab01"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    [tabBarItem2 setSelectedImage:[[UIImage imageNamed:@"tab01"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     
     NSInteger bageNumber = [MessageUtil getAllUnreadCount];
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:bageNumber];
     
     if (bageNumber)
-        tabBarItem1.badgeValue = [NSString stringWithFormat:@"%ld",(long)bageNumber];
+        tabBarItem2.badgeValue = [NSString stringWithFormat:@"%ld",(long)bageNumber];
     else
-        tabBarItem1.badgeValue = nil;
+        tabBarItem2.badgeValue = nil;
     
-    tabBarItem2.title = NSLocalizedString(@"好友", nil);
-    [tabBarItem2 setImage:[[UIImage imageNamed:@"tab02"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
-    [tabBarItem2 setSelectedImage:[[UIImage imageNamed:@"tab02"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    tabBarItem3.title = NSLocalizedString(@"friends", nil);
+    [tabBarItem3 setImage:[[UIImage imageNamed:@"tab02"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    [tabBarItem3 setSelectedImage:[[UIImage imageNamed:@"tab02"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     
-    tabBarItem3.title = NSLocalizedString(@"發現", nil);
-    [tabBarItem3 setImage:[[UIImage imageNamed:@"tab03"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
-    [tabBarItem3 setSelectedImage:[[UIImage imageNamed:@"tab03"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     
-    tabBarItem4.title = NSLocalizedString(@"設定", nil);
+    
+    tabBarItem4.title = NSLocalizedString(@"settings", nil);
     [tabBarItem4 setImage:[[UIImage imageNamed:@"tab04"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     [tabBarItem4 setSelectedImage:[[UIImage imageNamed:@"tab04"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     
@@ -111,6 +127,16 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)refreshTabView{
+    for (UINavigationController *nav in self.viewControllers) {
+        for (UIViewController* view in nav.childViewControllers) {
+            if ( [view isKindOfClass:[HXDiscoverViewController class]]) {
+                [nav popToRootViewControllerAnimated:NO];
+            }
+        }
+        
+    }
+}
 
 
 @end

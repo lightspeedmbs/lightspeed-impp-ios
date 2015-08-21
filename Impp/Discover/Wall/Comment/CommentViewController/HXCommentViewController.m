@@ -68,7 +68,7 @@
 
 - (void)initNavigationBar
 {
-    [HXAppUtility initNavigationTitle:NSLocalizedString(@"留言", nil) barTintColor:[UIColor color3] withViewController:self];
+    [HXAppUtility initNavigationTitle:NSLocalizedString(@"comment", nil) barTintColor:[UIColor color3] withViewController:self];
 }
 
 - (void)initView

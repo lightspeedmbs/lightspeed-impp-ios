@@ -66,7 +66,7 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
     [self.friendSearchBar setShowsCancelButton:NO];
     self.friendSearchBar.delegate = self;
     self.friendSearchBar.tintColor = [UIColor color11];
-    self.friendSearchBar.placeholder = NSLocalizedString(@"搜尋好友名稱", nil);
+    self.friendSearchBar.placeholder = NSLocalizedString(@"search_by_name", nil);
     [self.view addSubview:self.friendSearchBar];
     
     /* tableView */
@@ -89,11 +89,11 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
 
 - (void)initNavigationBar
 {
-    [HXAppUtility initNavigationTitle:NSLocalizedString(@"新增群組聊天", nil) barTintColor:[UIColor color1] withViewController:self];
+    [HXAppUtility initNavigationTitle:NSLocalizedString(@"create_group_chat", nil) barTintColor:[UIColor color1] withViewController:self];
     
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [cancelButton addTarget:self action:@selector(cancelButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [cancelButton setTitle:NSLocalizedString(@"取消", nil) forState:UIControlStateNormal];
+    [cancelButton setTitle:NSLocalizedString(@"Cancel", nil) forState:UIControlStateNormal];
     [cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [cancelButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
     cancelButton.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:34/2];
@@ -103,7 +103,7 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
     
     UIButton *finishButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [finishButton addTarget:self action:@selector(finishButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [finishButton setTitle:NSLocalizedString(@"確認", nil) forState:UIControlStateNormal];
+    [finishButton setTitle:NSLocalizedString(@"OK", nil) forState:UIControlStateNormal];
     [finishButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [finishButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
     finishButton.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:34/2];
@@ -116,6 +116,8 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
 - (void)finishButtonTapped
 {
     
+    
+    
     NSMutableArray *selectedItems = [[NSMutableArray alloc]initWithCapacity:0];
     NSMutableArray *selectedClientIds = [[NSMutableArray alloc]initWithCapacity:0];
     NSMutableString* topicName = [[NSMutableString alloc] init];
@@ -123,7 +125,9 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
     /* add currentUser */
     HXUser *currentUser = [HXUserAccountManager manager].userInfo;
     [topicName setString:currentUser.userName];
-    
+    [selectedClientIds addObject:currentUser.clientId];
+    [selectedItems addObject:currentUser];
+    [self.topicSession addUsersObject:currentUser];
     for (HXUser *user in self.selectedFriendsArray)
     {
         [selectedItems addObject:user];
@@ -139,16 +143,22 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
     NSSet *clientIds = [NSSet setWithArray:selectedClientIds];
     
     if (self.topicSession){
-        
-        [[[HXIMManager manager]anIM] addClients:clientIds toTopicId:self.topicSession.topicId];
+        [[[HXIMManager manager]anIM] addClients:clientIds toTopicId:self.topicSession.topicId success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+            NSLog(@"AnIM addClients successful");
+        } failure:^(ArrownockException *exception) {
+            NSLog(@"AnIm addClients failed, error : %@", exception.getMessage);
+        }]; 
         NSError *error;
         if (![[CoreDataUtil sharedContext] save:&error]) {
             NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
         }
         [self dismissViewControllerAnimated:YES completion:nil];
     }else{
-        [HXIMManager manager].topicDelegate = self;
-        [[[HXIMManager manager]anIM] createTopic:topicName withOwner:currentUser.clientId withClients:clientIds];
+        [[[HXIMManager manager]anIM] createTopic:topicName withOwner:currentUser.clientId withClients:clientIds success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+            [self anIMDidCreateTopic:topicId];
+        } failure:^(ArrownockException *exception) {
+            NSLog(@"AnIm createTopic failed, error : %@", exception.getMessage);
+        }];
     }
     
 }
@@ -193,11 +203,11 @@ NSFetchedResultsControllerDelegate,UISearchBarDelegate>
 
 #pragma mark HXIMManager topic delegate method
 
-- (void)anIMDidCreateTopic:(NSString *)topicId errorCode:(NSInteger)ArrownockErrorCode exception:(NSString *)exception
+- (void)anIMDidCreateTopic:(NSString *)topicId
 {
     [self.tempChatInfo setObject:topicId forKey:@"topicId"];
     
-    HXChat *topicChatSession = [ChatUtil createChatSessionWithUser:self.tempChatInfo[@"users"]
+    HXChat *topicChatSession = [ChatUtil createChatSessionWithUser:[NSSet setWithArray:self.tempChatInfo[@"users"]]
                                                            topicId:topicId
                                                          topicName:self.tempChatInfo[@"title"]
                                                    currentUserName:[HXUserAccountManager manager].userInfo.userName

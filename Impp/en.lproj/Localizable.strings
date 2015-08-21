@@ -5,132 +5,175 @@
   Created by Herxun on 2015/4/14.
   Copyright (c) 2015年 hsujahhu. All rights reserved.
 */
+//"explore_friends" = "Friends";
+"%@_send_you_a_friend_request" = "%@ has sent you a Friend Request";
+"%@_is_now_your_friend" = "%@ is now your Friend";
 
-"聊天" =	"Chat";
-"好友" =	"Friends";
-"發現" =	"Discover";
-"設定" =	"Settings";
+"welcome_message_from_default_user" =	"你好! 我是箭扣科技Arrownock的小艾, 欢迎使用IM++ 😊";
 
-"用戶名稱" =	"User Name";
-"密碼" =	"Password";
-"註冊" =	"Sign Up";
-"登入" =	"Login";
-"您的用戶名稱必須是大小寫的英文字母" =	"Alphanumeric characters only";
+"%@_reply_%@" = "%@ Replied %@";
 
-"搜尋好友和群組" =	"Search Friends and Groups";
-"好友請求" =	"Friend Request";
-"群組列表" =	"Groups";
-"好友列表" =	"Friends";
-"加入新好友" =	"Add Friend";
-"新增群組聊天" =	"Create Group Chat";
+"no_friend_request" = "No New Friend Requests";
+"no_chat_history" = "No Chat History";
+"no_rooms_yet" = "There are no Rooms yet. Be the first to create one ：）";
 
-"群聊" =	"Group Chat";
-"群組" =	"Groups";
+"kicked" =  "You have been automatically logged out since you've logged in this account from another device.";
+"ok"  = "OK";
+"we_media" = "Media";
+"announcement" = "Bulletin";
+"rooms" = "Forums";
+"room_name_description_photo_are_mandatory" = "Name,  Description and Cover Photo are all required";
+"leave_room" = "Leave";
+"leave_group" = "Leave Group";
+"send_chat_message" = "Chat";
 
-"傳送" =	"Send";
+"chat_tab" = "Chat";
+"chat" =	"Chat";
+"friends"=	"Friends";
+"discover" =	"AppO";
+"settings" =	"Settings";
 
-"請輸入好友或群組名稱" = "Search Friends and Groups";
-"請輸入好友名稱並按下搜尋" =	"Search by Name";
-"加入好友" =	"Add";
-"已送邀請" =	"Sent";
-"已是好友" =	"Friends";
+"user_name" =	"User Name";
+"password" =	"Password";
+"sign-up" =	"Sign Up";
+"login" =	"Login";
+"alphanumeric_characters_only" =	"Alphanumeric characters only";
 
-"搜尋好友名稱" =	"Search by Name";
-
-"返回" =	"Back";
-"接受" =	"Accept";
-"拒絕" =	"Decline";
-"已接受" =	"Accepted";
-"已拒絕" =	"Declined";
-
-"搜尋好友和群組" =	"Search Friends and Groups";
-
-"取消" =	"Cancel";
-
-
-"拍攝照片" =	"Camera";
-"選取照片" =	"Choose a Photo";
-"傳送位置" = "Location";
-"錄製聲音" =	"Voice Message";
-"語音通話" =	"Call";
-"視訊通話" =	"Video Call";
+"search_friends_and_groups" =	"Search Friends and Groups";
+"friend_request" =	"Friend Request";
+"group_list" =	"Groups";
+"friend_list" =	"Friends";
+"add_friend" =	"Add New Friend";
+"create_group_chat" =	"New Group Chat";
 
 
+"group_chat" =	"Group Chat";
+"groups" =	"Groups";
+"group_name..." = "Name";
+"create_group" = "New Forum";
+"group_description..." = "Description";
+"group_description" ="Description";
+"leave" = "Leave";
+"join" = "Join";
+"create" = "Create";
+"no_result" = "No Result";
 
-"重新拍攝" =	"Retake";
-"使用照片" =	"Use Photo";
+"send"  =	"Send";
 
-"按住即可錄音" =	"Press to record message";
-"錄音中" =	"Recording";
-"放開即可傳送" =	"Release button to send";
+"please_enter_friends_and_groups_name"= "Search Friends and Groups";
+"Please Enter Friends Name" =	"Search by Name";
+"Add" =	"Add";
+"sent" =	"Sent";
+"already_friends" =	"Friends";
 
-"聲音訊息過短" =	"The message is too short";
-"放開以取消傳送" =	"Release button to cancel";
+"search_by_name" =	"Search by Name";
 
-"靜音" =	"Mute";
-"掛斷" =	"End Call";
-"取消靜音" =	"Unmute";
-
-
-"語音通話" =	"Call";
-
-"接聽" =	"Accept";
-
-"關閉鏡頭" =	"Camera Off";
-"開啟鏡頭" =	"Camera On";
-"視訊通話" =	"Video Call";
-
-
-"編輯" =	"Edit";
-"編輯群組名稱" =	"Edit Group Name";
-"邀請成員" =	"Invite Others";
-"退出群組" =	"Leave Group";
+"Back" =	"Back";
+"Accept" =	"Accept";
+"decline" =	"Decline";
+"Accepted" =	"Accepted";
+"Declined" =	"Declined";
 
 
-"編輯群組名稱" =	"Edit Group Name";
-"請輸入這個群組的名稱" =	"Enter Group Name";
+//"Search Friends and Groups" =	"Search Friends and Groups";
 
-"儲存" =	"Save";
-
-"確認" =	"OK";
-
-"刪除並解散群組" =	"Delete Group";
-
-"朋友圈" =	"Timeline";
-
-"讚" =	"Like";
-"留言" =	"Comment";
-"傳送" =	"Send";
-"查看照片" =	"View Photo";
-"新增貼文" =	"New Post";
-"拍攝照片" =	"Camera";
-"選取照片" =	"Choose a Photo";
-
-"發佈" =	"Post";
-
-"登出" =	"Logout";
+"Cancel" =	"Cancel";
 
 
-"%@ 向您傳送了圖片" = "%@ sent you an image";
-"您收到來自 %@ 的聲音訊息" = "%@ sent you a voice message";
-"%@ 向您傳送了位置訊息" = "%@ sent you a location";
+"camera" =	"Camera";
+"choose_a_photo" =	"Choose a Photo";
+"location" = "Location";
+"voice_message" =	"Voice Message";
+"call" =	"Call";
+"video_call" =	"Video Call";
 
-"圖片已傳送" = "Image sent";
-"聲音訊息已傳送" = "Voice message sent";
-"位置訊息已傳送" = "Location sent";
 
-"拒絕好友請求成功" = "Rejected Friend Request";
-"發送好友請求成功" =	"Sent Friend Request";
-"好友邀請同意" =	"Accepted Friend Request";
-"收到好友邀請" =	"Received Friend Request";
 
-"正在等待對方接受邀請..." =	"Waiting...";
-"語音通話來電中..." =	"Incoming Call...";
-"語音通話進行中..." =	"Call in progress...";
-"視訊通話來電中..." =	"Incoming Video Call...";
-"視訊通話進行中..." =	"Video Call ...";
+//"retake" =	"Retake";
+//"use_photo" =	"Use Photo";
 
-"撰寫貼文..." =	"Say something...";
-"已讀" = "Read";
-"上午" = "AM";
-"下午" = "PM";
+"press_to_record_message" =	"Press to record message";
+"recording" =	"Recording";
+"release_button_to_send" =	"Release button to send";
+
+"the_message_is_too_short" =	"The message is too short";
+"release_button_to_cancel" =	"Release button to cancel";
+
+"mute" =	"Mute";
+"end_call" =	"End Call";
+"unmute" =	"Unmute";
+
+
+//"call" =	"Call";
+
+"accept_call" =	"Accept";
+
+"camera_off" =	"Camera Off";
+"camera_on" =	"Camera On";
+//"video_call" =	"Video Call";
+
+
+"edit" =	"Edit";
+"edit_group_name" =	"Edit Group Name";
+"invite_others" =	"Invite Others";
+
+
+"enter_group_name" =	"Enter Group Name";
+
+"save" =	"Save";
+
+"OK" =	"OK";
+
+"delete_group" =	"Delete Group";
+
+"timeline" =	"Moments";
+
+"like" =	"Like";
+"comment" =	"Comment";
+//"send"  =	"Send";
+"view_photo" =	"View Photo";
+"new_post" =	"New Post";
+"camera" =	"Camera";
+//"choose_a_photo" =	"Choose a Photo";
+
+"post" =	"Post";
+
+"logout" =	"Logout";
+
+
+"%@_sent_you_an_image" = "%@ sent you an image";
+"%@_sent_you_a_voice_message" = "%@ sent you a voice message";
+"%@_sent_you_a_location" = "%@ sent you a location";
+
+"image_sent" = "Image sent";
+"voice_message_sent" = "Voice message sent";
+"location_sent" = "Location sent";
+
+"rejected_friend_request" = "Rejected Friend Request";
+"sent_friend_request" =	"Sent Friend Request";
+"accepted_friend_request" =	"Accepted Friend Request";
+"received_friend_request" =	"Received Friend Request";
+
+"waiting..." =	"Waiting...";
+"incoming_call..." =	"Incoming Call...";
+"call_in_progress..." =	"Call in progress...";
+"incoming_video_call..." =	"Incoming Video Call...";
+"video_call_in_progress..." =	"Video Call In Progress...";
+
+"say_something..." =	"Say something...";
+"read" = "Read";
+"AM" = "AM";
+"PM" = "PM";
+
+//
+// 客服使用文字 *
+"customer_service_title" ="Help Desk";
+"helpdesk"  = "Help Desk";
+"products" = "Products";
+"services" = "Services";
+"contact_us" = "Contact Us";
+"vip_Customer_helpDesk" = "Contact help desk";
+"no_customer_representatives" = "There are no customer representatives";
+"vip_customer_title"= "Help Desk";
+"offline" = "Offline";
+"online" = "Online";

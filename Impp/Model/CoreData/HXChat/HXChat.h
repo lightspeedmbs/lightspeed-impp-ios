@@ -13,6 +13,8 @@
 
 @interface HXChat : NSManagedObject
 
+@property (nonatomic, retain) NSString * isAnRoomChat;
+
 @property (nonatomic, retain) NSString * currentClientId;
 @property (nonatomic, retain) NSString * currentUserName;
 @property (nonatomic, retain) NSString * lastMsgId;

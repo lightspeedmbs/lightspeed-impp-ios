@@ -25,6 +25,7 @@ static NSString *DidGetOfflineTopicMessage = @"DidGetOfflineTopicMessage";
 + (void)updateMessage:(NSArray *)message processStatus:(NSString *)status;
 
 + (NSArray *)getMessageByTopicId:(NSString *)topicId processStatus:(NSString *)processStatus;
++ (NSArray *)getMessageByTopicId:(NSString *)topicId;
 + (NSArray *)getMessageByChatSession:(HXChat *)chat;
 
 + (HXMessage *)getMessageByMessageId:(NSString *)msgId;
@@ -40,4 +41,6 @@ static NSString *DidGetOfflineTopicMessage = @"DidGetOfflineTopicMessage";
 + (BOOL)updateMessageReadAckByMessageIds:(NSArray *)msgIds;
 + (BOOL)updateRemoteMessageReadAckByMessageId:(NSString *)msgId;
 + (NSInteger)getAllUnreadCount;
+
++ (void)deleteMessage:(HXMessage *)message;
 @end

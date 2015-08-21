@@ -8,7 +8,8 @@
 
 #import "HXMessage+Additions.h"
 #import "CoreDataUtil.h"
-
+#import "HXChat.h"
+#import "HXChat+Additions.h"
 @implementation HXMessage(Additions)
 
 + (BOOL) isObjectAvailable:(id) data {
@@ -54,6 +55,7 @@
     self.longitude = @(999.0f);
     self.processStatus = STATUS_CREATE;
     self.chat = nil;
+    self.senderPhotoUrl = @"";
 }
 
 - (BOOL)setValuesFromDict:(NSDictionary *)dict
@@ -85,6 +87,9 @@
     if ([HXMessage isObjectAvailable:dict[@"senderName"]])
         self.senderName = dict[@"senderName"];
     
+    if ([HXMessage isObjectAvailable:dict[@"senderPhotoUrl"]])
+        self.senderPhotoUrl = dict[@"senderPhotoUrl"];
+    
     if ([HXMessage isObjectAvailable:dict[@"userId"]])
         self.userId = dict[@"userId"];
     
@@ -100,8 +105,12 @@
     if ([HXMessage isObjectAvailable:dict[@"latitude"]])
         self.latitude = @([dict[@"latitude"] doubleValue]);
     
-    if ([HXMessage isObjectAvailable:dict[@"chat"]])
+    if ([HXMessage isObjectAvailable:dict[@"chat"]]){
         self.chat = dict[@"chat"];
+        //HXChat *chatchat = dict[@"chat"];
+        //self.chatDic = [chatchat toDict];
+    }
+    
     
     if ([HXMessage isObjectAvailable:dict[@"processStatus"]])
         self.processStatus = dict[@"processStatus"];
@@ -148,6 +157,9 @@
     if ([HXMessage isObjectAvailable:dict[@"userId"]])
         self.userId = dict[@"userId"];
     
+    if ([HXMessage isObjectAvailable:dict[@"senderPhotoUrl"]])
+        self.senderPhotoUrl = dict[@"senderPhotoUrl"];
+    
     if ([HXMessage isObjectAvailable:dict[@"currentClientId"]])
         self.currentClientId = dict[@"currentClientId"];
     
@@ -160,23 +172,28 @@
     if ([HXMessage isObjectAvailable:dict[@"latitude"]])
         self.latitude = @([dict[@"latitude"] doubleValue]);
     
-    if ([HXMessage isObjectAvailable:dict[@"chat"]])
+    if ([HXMessage isObjectAvailable:dict[@"chat"]]){
         self.chat = dict[@"chat"];
-    
+        //HXChat *chatchat = dict[@"chat"];
+        //self.chatDic = [chatchat toDict];
+    }
     if ([HXMessage isObjectAvailable:dict[@"processStatus"]])
         self.processStatus = dict[@"processStatus"];
+    
     
 
     return YES;
 }
 
 - (NSDictionary*)toDict{
+    //NSDictionary* chat = [self.chat toDict];
+    
     NSDictionary* dict = @{@"type":self.type,
                            @"msgId":self.msgId,
                            @"processStatus":self.processStatus,
                            @"topicId":self.topicId,
                            @"message":self.message,
-                           @"content":self.content,
+                           @"content":self.content ? self.content:[[NSData alloc]init],
                            @"from":self.from,
                            @"timestamp":self.timestamp,
                            @"readACK":self.readACK,
@@ -185,7 +202,9 @@
                            @"currentClientId":self.currentClientId,
                            @"fileURL":self.fileURL,
                            @"longitude":self.longitude,
-                           @"latitude":self.latitude};
+                           @"latitude":self.latitude,
+                           @"chat":self.chat,
+                           @"senderPhotoUrl":self.senderPhotoUrl};
     return dict;
     
 }

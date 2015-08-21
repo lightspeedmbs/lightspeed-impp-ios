@@ -18,6 +18,7 @@
 #import "NotificationCenterUtil.h"
 #import "AnSocialFile.h"
 #import "HXIMManager.h"
+#import "MessageUtil.h"
 
 @interface HXAnSocialManager () <AnIMDelegate>
 @property (strong, nonatomic) AnSocial *anSocial;
@@ -42,7 +43,6 @@
     self = [super init];
     if (self) {
         self.anSocial = [[AnSocial alloc] initWithAppKey:LIGHTSPEED_APP_KEY];
-        [self.anSocial setSecureConnection:YES];
         [self.anSocial setTimeout:20.0f];
         
     }
@@ -88,40 +88,148 @@
         NSMutableSet *userClientIds = [[NSMutableSet alloc]initWithCapacity:0];
         
         /* To sync with server*/
-        
-        for (NSDictionary *user in tempfriends)
-        {
-            
-            NSDictionary *reformedUser = [UserUtil reformUserInfoDic:user];
-            
-            HXUser *hxUser = [UserUtil getHXUserByUserId:reformedUser[@"userId"]];
-            
-            if (hxUser == nil) {
-                hxUser = [HXUser initWithDict:reformedUser];
-            }else{
-                //update
-                [hxUser setValuesFromDict:reformedUser];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (NSDictionary *user in tempfriends)
+            {
+                
+                NSDictionary *reformedUser = [UserUtil reformUserInfoDic:user];
+                
+                HXUser *hxUser = [UserUtil getHXUserByUserId:reformedUser[@"userId"]];
+                
+                if (hxUser == nil) {
+                    hxUser = [HXUser initWithDict:reformedUser];
+                }else{
+                    //update
+                    [hxUser setValuesFromDict:reformedUser];
+                }
+                
+                /* Detect remote user "isMutual" flag*/
+                if ([(NSNumber *)user[@"friendProperties"][@"isMutual"] intValue] == 1) {
+                    [UserUtil updatedUserFriendsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:hxUser];
+                }else{
+                    [UserUtil updatedUserFollowsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:hxUser];
+                }
+                
+                [userClientIds addObject:hxUser.clientId];
+                
+                //NSLog(@"%@",hxUser.photoURL);
+                [tempUserArray addObject:hxUser];
+                //[[HXImageStore imageStore]setImageUrl:hxUser.photoURL forKey:hxUser.clientId];
             }
             
-            /* Detect remote user "isMutual" flag*/
-            if ([(NSNumber *)user[@"friendProperties"][@"isMutual"] intValue] == 1) {
-                [UserUtil updatedUserFriendsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:hxUser];
-            }else{
-                [UserUtil updatedUserFollowsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:hxUser];
-            }
-            
-            [userClientIds addObject:hxUser.clientId];
-            
-            //NSLog(@"%@",hxUser.photoURL);
-            [tempUserArray addObject:hxUser];
-            //[[HXImageStore imageStore]setImageUrl:hxUser.photoURL forKey:hxUser.clientId];
-        }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:RefreshFriendList object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:RefreshFriendList object:nil];
+
+        });
         
     }failure:^(NSDictionary* response){
         NSLog(@"Error: %@", [[response objectForKey:@"meta"] objectForKey:@"message"]);
         
+    }];
+}
+
+// Add the default friend
+- (void)addDefaultFriend:(NSString *)currentUserId
+{
+    if(!LIGHTSPEED_DEFAULT_FRIEND_ID || [LIGHTSPEED_DEFAULT_FRIEND_ID isEqualToString:currentUserId])
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[HXAnSocialManager manager]fetchFriendInfo];
+        });
+        return;
+    }
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    [params setObject:LIGHTSPEED_DEFAULT_FRIEND_ID forKey:@"user_ids"];
+    
+    [[HXAnSocialManager manager]sendRequest:@"users/get.json" method:AnSocialManagerGET params:params success:^(NSDictionary* response){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"success log users/get.json: %@",[response description]);
+            NSMutableArray *tempUsers = [[NSMutableArray alloc]initWithCapacity:0];
+            NSMutableArray *tempUserArray = [[NSMutableArray alloc]initWithCapacity:0];
+            tempUsers = [[NSArray arrayWithArray:[[response objectForKey:@"response"] objectForKey:@"users"]] mutableCopy];
+            if (tempUsers.count == 0) {
+                NSLog(@"add default friend error: default friend is not existed.");
+                [[HXAnSocialManager manager]fetchFriendInfo];
+                return;
+            }
+            
+            NSMutableSet *userClientIds = [[NSMutableSet alloc]initWithCapacity:0];
+            HXUser *currentUser = [UserUtil getHXUserByUserId:currentUserId];
+            NSSet *currentUserFriends = currentUser.friends;
+            for (NSDictionary *user in tempUsers)
+            {
+                NSDictionary *defaultFriendDic = [UserUtil reformUserInfoDic:user];
+                HXUser *defaultFriend = [UserUtil getHXUserByUserId:defaultFriendDic[@"userId"]];
+                if (defaultFriend == nil) {
+                    defaultFriend = [HXUser initWithDict:defaultFriendDic];
+                }else{
+                    //update
+                    [defaultFriend setValuesFromDict:defaultFriendDic];
+                }
+                
+                if ([currentUserFriends containsObject:defaultFriend]) {
+                    NSLog(@"add default friend. default friend is already added.");
+                    [[HXAnSocialManager manager]fetchFriendInfo];
+                    return;
+                }
+                NSMutableDictionary *currentUserAddArrownockParams = [[NSMutableDictionary alloc] init];
+                [currentUserAddArrownockParams setObject:currentUserId forKey:@"user_id"];
+                [currentUserAddArrownockParams setObject:defaultFriend.userId forKey:@"target_user_id"];
+                [[HXAnSocialManager manager]sendRequest:@"friends/add.json" method:AnSocialManagerPOST params:currentUserAddArrownockParams success:^(NSDictionary *response) {
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSMutableDictionary *arrownockAddCurrentUserParams = [[NSMutableDictionary alloc] init];
+                        [arrownockAddCurrentUserParams setObject:currentUserId forKey:@"target_user_id"];
+                        [arrownockAddCurrentUserParams setObject:defaultFriend.userId forKey:@"user_id"];
+                        
+                        [[HXAnSocialManager manager]sendRequest:@"friends/add.json" method:AnSocialManagerPOST params:arrownockAddCurrentUserParams success:^(NSDictionary *response) {
+                            NSLog(@"success log arrownockAddCurrentUserParams: %@",[response description]);
+                            
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                //在本地将Default friend加为好友
+                                [UserUtil updatedUserFollowsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:defaultFriend];
+                                //添加Default friend发来的一条消息
+                                NSDate *datenow = [NSDate date];
+                                long long timeSp =(long long)[datenow timeIntervalSince1970];
+                                timeSp = timeSp * 1000;
+                                NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
+                                [customData setObject:defaultFriend.userName forKey:@"name"];
+                                NSString *message = NSLocalizedString(@"welcome_message_from_default_user", nil);
+                                AnIMMessage *customMessage = [[AnIMMessage alloc]initWithType:AnIMTextMessage
+                                                                                        msgId:@"100000000"
+                                                                                      topicId:@""
+                                                                                      message:message
+                                                                                      content:nil
+                                                                                     fileType:nil
+                                                                                         from:defaultFriend.clientId
+                                                                                   customData:customData
+                                                                                    timestamp:[NSNumber numberWithLongLong:timeSp]];
+                                
+                                HXMessage *hxCustomMessage = [MessageUtil anIMMessageToHXMessage:customMessage];
+                                [MessageUtil saveChatMessageIntoDB:@[customMessage] withTargetClientId:hxCustomMessage.from];
+                                NSLog(@"saveWelcomeChatMessageIntoDB succ.");
+                                [[HXAnSocialManager manager]fetchFriendInfo];
+                            });
+                            
+                        } failure:^(NSDictionary *response) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [[HXAnSocialManager manager]fetchFriendInfo];
+                                NSLog(@"addDefaultFriend Error: %@", [[response objectForKey:@"meta"] objectForKey:@"message"]);
+                            });
+                        }];
+                    });
+                } failure:^(NSDictionary *response) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[HXAnSocialManager manager]fetchFriendInfo];
+                        NSLog(@"addDefaultFriend Error: %@", [[response objectForKey:@"meta"] objectForKey:@"message"]);
+                    });
+                }];
+            }
+        });
+    }failure:^(NSDictionary* response){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[HXAnSocialManager manager]fetchFriendInfo];
+            NSLog(@"addDefaultFriend Error: %@", [[response objectForKey:@"meta"] objectForKey:@"message"]);
+        });
     }];
 }
 

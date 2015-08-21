@@ -10,25 +10,31 @@
 #import "HXAppUtility.h"
 #import "HXChatViewController.h"
 #import "HXChat+Additions.h"
+#import "UILabel+customLabel.h"
 #import "HXMessage+Additions.h"
 #import "HXUser+Additions.h"
 #import "UserUtil.h"
 #import "ChatUtil.h"
+#import "AnRoomUtil.h"
 #import "MessageUtil.h"
 #import "CoreDataUtil.h"
 #import "HXUserAccountManager.h"
 #import "NotificationCenterUtil.h"
 #import "HXTabBarViewController.h"
 #import "HXIMManager.h"
+#import "HXAnRoom+Additions.h"
 #import "HXChatHistoryTableViewCell.h"
 #import "UIColor+CustomColor.h"
 #import <CoreData/CoreData.h>
 #define VIEW_WIDTH self.view.frame.size.width
+#define SCREEN_WIDTH [[UIScreen mainScreen] applicationFrame].size.width
+#define SCREEN_HEIGHT [[UIScreen mainScreen] applicationFrame].size.height
 
 @interface HXChatHistoryViewController ()<UITableViewDataSource, UITableViewDelegate,NSFetchedResultsControllerDelegate,UISearchBarDelegate, UISearchDisplayDelegate>
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *chatHistoryArray;
 @property (strong, nonatomic) NSMutableArray *chatHistoryFilterArray;
+@property (strong, nonatomic) NSMutableArray *tempArray;
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) UISearchBar* searchBar;
 @property (strong, nonatomic) UISearchDisplayController* searchController;
@@ -54,6 +60,11 @@
                                             selector:@selector(showMessageFromNotification:)
                                                 name:ShowMessageFromNotificaiton
                                               object:nil];
+    
+        [[NSNotificationCenter defaultCenter]addObserver:self
+                                                selector:@selector(resetFetch)
+                                                    name:@"loggedIn"
+                                                  object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -81,10 +92,12 @@
     [self.searchBar setShowsCancelButton:NO];
     self.searchBar.delegate = self;
     self.searchBar.tintColor = [UIColor color11];
-    self.searchBar.placeholder = NSLocalizedString(@"搜尋好友和群組", nil);
-    
-    [[UIBarButtonItem appearanceWhenContainedIn:[UISearchBar class], nil] setTitle:NSLocalizedString(@"取消", nil)];
-    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTintColor:[UIColor color2]];
+    self.searchBar.placeholder = NSLocalizedString(@"search_friends_and_groups", nil);
+    if ([HXAppUtility isiOS8]) {
+        [[UIBarButtonItem appearanceWhenContainedIn:[UISearchBar class], nil] setTitle:NSLocalizedString(@"Cancel", nil)];
+        [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTintColor:[UIColor color2]];
+    }
+
     [self.view addSubview:self.searchBar];
     
     /* search controller */
@@ -96,7 +109,7 @@
     [self.searchController setSearchResultsDelegate:self];
     [self.searchController setSearchResultsDataSource:self];
     
-    frame = self.view.frame;
+    frame = [[UIScreen mainScreen]bounds];
     frame.origin.y = self.searchBar.frame.size.height + self.searchBar.frame.origin.y;
     frame.size.height -= 64 + self.tabBarController.tabBar.frame.size.height + self.searchBar.frame.size.height;
     self.tableView = [[UITableView alloc] initWithFrame:frame
@@ -152,19 +165,27 @@
     HXMessage *lastMessage = [ChatUtil getLastMessage:chatSession];
     NSString *lastStr = [MessageUtil configureLastMessage:lastMessage];
     NSInteger unreadCount = [ChatUtil unreadCount:chatSession];
-
+    NSString *photoUrl;
     if (![chatSession.topicId isEqualToString:@""]) {
-        NSString *topicName = [NSString stringWithFormat:@"%@ (%d)",chatSession.topicName,(int)chatSession.users.count + 1];
+        if ([chatSession.isAnRoomChat isEqualToString:@"_ANROOM_"]) {
+            HXAnRoom *anroom = [AnRoomUtil getRoomByTopicId:chatSession.topicId];
+            photoUrl = anroom.toDict[@"photoUrl"];
+        }else{
+            photoUrl = @"";
+        }
+        
+        
+        NSString *topicName = [NSString stringWithFormat:@"%@ (%d)",chatSession.topicName,(int)chatSession.users.count];
         HXChatHistoryTableViewCell *cell = [[HXChatHistoryTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                                                              reuseIdentifier:cellIdentifier
                                                                                        title:topicName
                                                                                     subtitle:lastStr
                                                                                    timestamp:lastMessage.timestamp
-                                                                                    photoUrl:@""
+                                                                                    photoUrl:photoUrl
                                                                             placeholderImage:[UIImage imageNamed:@"friend_group"]
                                                                                   badgeValue:unreadCount];
         cell.backgroundColor = [UIColor clearColor];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return cell;
     }else{
@@ -193,7 +214,7 @@
                                                                             placeholderImage:[UIImage imageNamed:@"friend_default"]
                                                                                   badgeValue:unreadCount];
         cell.backgroundColor = [UIColor clearColor];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return cell;
     }
@@ -213,6 +234,7 @@
     BOOL isTopicMode = [chatSession.topicId isEqualToString:@""] ? NO:YES;
     HXChatViewController *chatVc = [[HXChatViewController alloc]initWithChatInfo:chatSession setTopicMode:isTopicMode];
     [self.navigationController pushViewController:chatVc animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -224,16 +246,17 @@
     
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         //add code here for when you hit delete
+
         // Remove the row from data model
         NSMutableArray* chatSessions;
         if (tableView == self.searchController.searchResultsTableView)
             chatSessions = self.chatHistoryFilterArray;
         else
             chatSessions = self.chatHistoryArray;
-        
+
         [ChatUtil deleteChatHistory:chatSessions[indexPath.row]];
-        [chatSessions removeObjectAtIndex:indexPath.row];
-        
+
+     
         // Request table view to reload
         [tableView beginUpdates];
         [tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]]
@@ -248,6 +271,9 @@
 - (void)fetchChatHistory
 {
     NSError* error;
+    
+//    NSFetchedResultsController *fetchedResultsController = [[NSFetchedResultsController alloc]init];
+//    [fetchedResultsController performFetch:&error];
     [self.fetchedResultsController performFetch:&error];
     if (error) {
         NSLog(@"error: %@", [error localizedDescription]);
@@ -259,10 +285,15 @@
             
             HXChat* chat = self.fetchedResultsController.fetchedObjects[i];
             [self.chatHistoryArray addObject:chat];
+            
         }
     }
 
-    
+    if (!_chatHistoryArray.count) {
+        [self addEmptyPage];
+    }else{
+        self.tableView.backgroundView = nil;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
         
@@ -272,12 +303,12 @@
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
 {
-    self.searchBar.placeholder = NSLocalizedString(@"請輸入好友或群組名稱", nil);
+    self.searchBar.placeholder = NSLocalizedString(@"please_enter_friends_and_groups_name", nil);
 }
 
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
 {
-    self.searchBar.placeholder = NSLocalizedString(@"搜尋好友和群組", nil);
+    self.searchBar.placeholder = NSLocalizedString(@"search_friends_and_groups", nil);
 }
 
 #pragma mark - UISearchDisplayDelegate
@@ -314,6 +345,7 @@
 - (NSFetchedResultsController *)fetchedResultsController
 {
     if (_fetchedResultsController != nil) {
+//        _fetchedResultsController = nil;
         return _fetchedResultsController;
     }
     
@@ -373,4 +405,45 @@
     
 }
 
+
+
+-(void)searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller{
+    
+    self.searchDisplayController.searchBar.showsCancelButton = YES;
+    UIButton *cancelButton;
+    UIView *topView = self.searchDisplayController.searchBar.subviews[0];
+    for (UIView *subView in topView.subviews) {
+        if ([subView isKindOfClass:NSClassFromString(@"UINavigationButton")]) {
+            cancelButton = (UIButton*)subView;
+        }
+    }
+    if (cancelButton) {
+        //Set the new title of the cancel button
+        [cancelButton setTitle:NSLocalizedString(@"Cancel", nil) forState:UIControlStateNormal];
+    }
+}
+
+
+-(void) addEmptyPage{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *tableEmptyView = [[UIView alloc]initWithFrame:self.tableView.bounds];
+
+        UILabel *emptyLabel = [UILabel labelWithFrame:CGRectMake(0, SCREEN_HEIGHT * 0.23,SCREEN_WIDTH, 15)
+                                                 text:NSLocalizedString(@"no_chat_history", nil)
+                                        textAlignment:NSTextAlignmentCenter
+                                            textColor:[UIColor color8]
+                                                 font:[UIFont fontWithName:@"STHeitiTC-Light" size:15]
+                                        numberOfLines:1];
+        [emptyLabel setFrame:CGRectMake(SCREEN_WIDTH/2-emptyLabel.frame.size.width/2, SCREEN_HEIGHT * 0.25 - 8, emptyLabel.frame.size.width, 16)];
+        //[tableEmptyView addSubview:tempImageView];
+        [tableEmptyView addSubview:emptyLabel];
+        
+        self.tableView.backgroundView = tableEmptyView;
+    });
+    
+}
+
+-(void)resetFetch{
+    _fetchedResultsController = nil;
+}
 @end

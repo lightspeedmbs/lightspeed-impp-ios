@@ -14,23 +14,21 @@
 
 @protocol HXIMManagerTopicDelegate <NSObject>
 @optional
-- (void)anIMDidCreateTopic:(NSString *)topicId errorCode:(NSInteger)ArrownockErrorCode exception:(NSString *)exception;
-- (void)anIMDidGetTopicList:(NSArray *)topics errorCode:(NSInteger)ArrownockErrorCode exception:(NSString *)exception;
-- (void)anIMDidGetTopicInfo:(NSString *)topicId name:(NSString *)topicName parties:(NSSet *)parties createdDate:(NSDate *)createdDate exception:(NSString *)exception;
 - (void)anIMDidUpdateStatus:(BOOL)status exception:(NSString *)exception;
-- (void)anIMDidGetClientsStatus:(NSDictionary *)clientsStatus exception:(NSString *)exception;
 
 @end
 
+//@protocol  HXClientStatusDelegate <NSObject>
+//- (void)anIMDidGetClientsStatus:(NSDictionary *)clientsStatus exception:(NSString *)exception;
+//@end
+
 @protocol HXIMManagerChatDelegate <NSObject>
-- (void)anIMDidAddClientsWithException:(NSString *)exception;
 - (void)anIMMessageSent:(NSString *)messageId;
 - (void)anIMSendReturnedException:(NSString *)exception messageId:(NSString *)messageId;
 - (void)anIMDidReceiveMessage:(NSString *)message customData:(NSDictionary *)customData from:(NSString *)from topicId:(NSString *)topicId messageId:(NSString *)messageId at:(NSNumber *)timestamp customMessage:(HXMessage *)customMessage;
 - (void)anIMDidReceiveBinaryData:(NSData *)data fileType:(NSString *)fileType customData:(NSDictionary *)customData from:(NSString *)from topicId:(NSString *)topicId messageId:(NSString *)messageId at:(NSNumber *)timestamp customMessage:(HXMessage *)customMessage;
 @optional
 - (void)anIMDidUpdateStatus:(BOOL)status exception:(NSString *)exception;
-- (void)anIMDidGetClientsStatus:(NSDictionary *)clientsStatus exception:(NSString *)exception;
 @end
 
 @protocol HXIMManagerNoticeDelegate <NSObject>
@@ -70,10 +68,20 @@
 @property BOOL clientStatus;
 @property BOOL isAppEnterBackground;
 @property BOOL isGetTopicList;
+@property BOOL kicked;
+
+//@property (weak, nonatomic) id<HXClientStatusDelegate> clientStatusDelegate;
 
 - (void)checkIMConnection;
+- (void)getStatusForClients:(NSSet *)clientSet;
+
 - (HXChatViewController *)getChatViewWithTargetClientId:(NSString *)targetClientId targetUserName:(NSString *)targetUserName currentUserName:(NSString *)currentUserName;
 - (void)sendFriendRequestApprovedMessageWithClientId:(NSString *)clientId;
 - (void)sendFriendRequestMessageWithClientId:(NSString *)clientId targetUserName:(NSString *)username;
 - (void)sendSocialNoticeWithClientId:(NSSet *)clientIds objectType:(NSString *)type objectInfo:(NSDictionary *)objectInfo notificationAlert:(NSString *)notificationAlert;
+
+- (void)getStatusForClients:(NSSet *)clientSet
+                    success:(void (^)(NSDictionary *clientsStatus))success
+                    failure:(void (^)(ArrownockException *exception))failure;
+
 @end

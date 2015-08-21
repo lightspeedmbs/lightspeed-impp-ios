@@ -10,6 +10,8 @@
 
 @protocol HXMessageCellDelegate <NSObject>
 - (void)messageCellImageTapped:(NSInteger)index;
+- (void)userPhotoImageTapped:(NSInteger)index;
+
 @end
 
 @interface HXMessageTableViewCell : UITableViewCell

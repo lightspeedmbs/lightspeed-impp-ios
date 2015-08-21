@@ -9,6 +9,8 @@
 #import "HXUserAccountManager.h"
 #import "HXAnSocialManager.h"
 #import "HXIMManager.h"
+#import "AnPush.h"
+#import "LightspeedCredentials.h"
 
 @interface HXUserAccountManager ()
 @property (strong, nonatomic) NSMutableDictionary *clientIdToContactsInfoDic;
@@ -62,7 +64,7 @@
     self.coverPhotoUrl = self.userInfo.coverPhotoURL;
     self.email = @"";
 
-    [[HXAnSocialManager manager]fetchFriendInfo];
+    [[HXAnSocialManager manager] addDefaultFriend:self.userId];
     [HXIMManager manager].isGetTopicList = NO;
     if (clientId)
     {
@@ -71,6 +73,23 @@
         dispatch_async(dispatch_get_main_queue(), ^{
            [[HXIMManager manager] checkIMConnection];
         });
+    }
+    
+    @try {
+        if(clientId && [AnPush shared])
+        {
+            [[[HXIMManager manager]anIM] bindAnPushService:[[AnPush shared] getAnID] appKey:LIGHTSPEED_APP_KEY clientId:clientId  success:^{
+                NSLog(@"AnIM bindAnPushService successful");
+            } failure:^(ArrownockException *exception) {
+                NSLog(@"AnIm bindAnPushService failed, error : %@", exception.getMessage);
+            }];
+        }
+    }
+    @catch (ArrownockException *exception) {
+        // catch the exception from crashing
+    }
+    @finally {
+        
     }
     
     [[NSUserDefaults standardUserDefaults] setObject:@{@"userId": userId ? userId : @"",
@@ -83,7 +102,36 @@
 
 - (void)userSignedOut
 {
-    [[[HXIMManager manager]anIM] unbindAnPushService:AnPushTypeiOS];
+
+//    [[[HXIMManager manager]anIM] unbindAnPushService:AnPushTypeiOS success:^{
+//        NSLog(@"AnIM unbindAnPushService successful");
+//    } failure:^(ArrownockException *exception) {
+//        NSLog(@"AnIm unbindAnPushService failed, error : %@", exception.getMessage);
+//    }];
+    @try {
+        if([AnPush shared])
+        {
+            [[[HXIMManager manager]anIM] unbindAnPushService:[[AnPush shared] getAnID] appKey:LIGHTSPEED_APP_KEY clientId:[HXIMManager manager].clientId success:^(){
+                NSLog(@"AnIM unbindAnPushService successful");
+            } failure:^(ArrownockException *exception) {
+                NSLog(@"AnIm unbindAnPushService failed, error : %@", exception.getMessage);
+            }];
+        }
+    }
+    @catch (ArrownockException *exception) {
+        // catch the exception from crashing
+    }
+    @finally {
+            
+    }
+
+    
+//    [[[HXIMManager manager]anIM] unbindAnPushService:[[AnPush shared] getAnID] appKey:LIGHTSPEED_APP_KEY clientId:[HXIMManager manager].clientId success:^(){
+//        NSLog(@"AnIM unbindAnPushService successful");
+//    } failure:^(ArrownockException *exception) {
+//        NSLog(@"AnIm unbindAnPushService failed, error : %@", exception.getMessage);
+//    }];
+    
     [[[HXIMManager manager]anIM] disconnect];
     self.userId = nil;
     self.userName = nil;

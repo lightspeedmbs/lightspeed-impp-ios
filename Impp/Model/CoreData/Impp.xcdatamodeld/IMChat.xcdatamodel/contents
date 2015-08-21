@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14B25" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14E46" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="HXAnRoom" representedClassName="HXAnRoom" syncable="YES">
+        <attribute name="anRoomId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="circleOwner" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="photoUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="roomDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="roomName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="users" optional="YES" attributeType="Transformable" syncable="YES"/>
+    </entity>
     <entity name="HXChat" representedClassName="HXChat" syncable="YES">
         <attribute name="currentClientId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="currentUserName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isAnRoomChat" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastMsgId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="targetClientId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="targetUserName" optional="YES" attributeType="String" syncable="YES"/>
@@ -52,6 +64,7 @@
         <attribute name="processStatus" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="readACK" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="senderName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="senderPhotoUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="topicId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
@@ -59,6 +72,7 @@
         <relationship name="chat" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HXChat" inverseName="messages" inverseEntity="HXChat" syncable="YES"/>
     </entity>
     <entity name="HXPost" representedClassName="HXPost" syncable="YES">
+        <attribute name="circle_id" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="commentCount" optional="YES" attributeType="Integer 64" defaultValueString="0.0" syncable="YES"/>
         <attribute name="commentRate" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
@@ -93,11 +107,12 @@
         <relationship name="topics" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="HXChat" syncable="YES"/>
     </entity>
     <elements>
-        <element name="HXChat" positionX="-162" positionY="36" width="128" height="210"/>
+        <element name="HXAnRoom" positionX="-486" positionY="99" width="128" height="180"/>
+        <element name="HXChat" positionX="-162" positionY="36" width="128" height="225"/>
         <element name="HXComment" positionX="-477" positionY="108" width="128" height="238"/>
         <element name="HXLike" positionX="-486" positionY="90" width="128" height="193"/>
-        <element name="HXMessage" positionX="421" positionY="-60" width="128" height="285"/>
-        <element name="HXPost" positionX="-495" positionY="81" width="128" height="300"/>
+        <element name="HXMessage" positionX="421" positionY="-60" width="128" height="300"/>
+        <element name="HXPost" positionX="-495" positionY="81" width="128" height="315"/>
         <element name="HXUser" positionX="-702" positionY="45" width="128" height="240"/>
     </elements>
 </model>

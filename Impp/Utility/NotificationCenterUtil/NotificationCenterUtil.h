@@ -18,6 +18,7 @@ static NSString *SaveTopicMessageToLocal = @"SaveTopicMessageToLocal";
 static NSString *RefreshFriendList = @"RefreshFriendList";
 static NSString *RefreshChatHistory = @"RefreshChatHistory";
 static NSString *RefreshWall = @"RefreshWall";
+static NSString *RefreshRoom = @"RefreshRoom";
 static NSString *UpdateFriendCircleBadge = @"UpdateFriendCircleBadge";
 static NSString *GetOfflineChatMessage = @"GetOfflineChatMessage";
 static NSString *GetOfflineTopicMessage = @"GetOfflineTopicMessage";

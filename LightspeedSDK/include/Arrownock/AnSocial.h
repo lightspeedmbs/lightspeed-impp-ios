@@ -17,4 +17,5 @@ typedef enum {
            success:(void (^)(NSDictionary *response))success
            failure:(void (^)(NSDictionary *response))failure;
 
+- (void)setHost:(NSString *)host;
 @end

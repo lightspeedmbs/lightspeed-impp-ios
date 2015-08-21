@@ -16,6 +16,10 @@
 #import "HXIMManager.h"
 #import "HXUserAccountManager.h"
 #import "HXTabBarViewController.h"
+#import "HXLoginSignupViewController.h"
+#import "KVNProgress.h"
+#import "HXAppUtility.h"
+#import   <TestinAgent/TestinAgent.h>
 
 @interface AppDelegate () <AnPushDelegate>
 
@@ -26,7 +30,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [NSThread sleepForTimeInterval:3.0];
     
+    [self registerPushNotification];
     
     self.window.backgroundColor = [UIColor color1];
     [UIApplication sharedApplication].statusBarHidden = NO;
@@ -38,22 +44,35 @@
         [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:@"unreadSocialNoticeCount"];
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(registerPushNotification)
-                                                 name:@"connect"
-                                               object:nil];
-    
     NSDictionary *lastUsed = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"lastLoggedInUser"];
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
                                                              bundle: nil];
+    
+    
+    HXTabBarViewController *vc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
+    self.window.rootViewController = vc;
     if (lastUsed) {
         [HXUserAccountManager manager].userInfo = [UserUtil getHXUserByUserId:lastUsed[@"userId"]];
         [[HXUserAccountManager manager] userSignedInWithId:lastUsed[@"userId"] name:lastUsed[@"userName"] clientId:lastUsed[@"clientId"]];
-        HXTabBarViewController *vc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
-        
-        self.window.rootViewController = vc;
+//        HXTabBarViewController *vc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
+//        
+//        self.window.rootViewController = vc;
+    }else{
+        //UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:self.window.rootViewController];
+        self.loginView = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXLoginSignupView" ] ;
+        [self.window makeKeyAndVisible];
+        [self.window.rootViewController presentViewController:_loginView animated:NO completion:nil];
     }
     
+    KVNProgressConfiguration *configuration = [[KVNProgressConfiguration alloc] init];
+    configuration.circleStrokeForegroundColor = [HXAppUtility hexToColor:0x5CB5B5 alpha:1];
+    configuration.circleSize = 55.0f;
+    [KVNProgress setConfiguration:configuration];
+    
+    // Testin APM
+    if(TESTIN_APM_ID) {
+        [TestinAgent init:TESTIN_APM_ID channel:@"" config:[TestinConfig defaultConfig]];
+    }
     return YES;
 }
 
@@ -67,42 +86,23 @@
 #pragma mark - Lightspeed push-notification registration result handler
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
-    [AnPush setup:LIGHTSPEED_APP_KEY deviceToken:deviceToken delegate:self secure:YES];
-    [[AnPush shared] register:@[ @"_IMPP_DEFAULT_" ] overwrite:YES];
+    [AnPush setup:LIGHTSPEED_APP_KEY deviceToken:deviceToken secure:YES];
+    [[AnPush shared] enable];
+    
+    if([[HXIMManager manager] clientId])
+    {
+        [[[HXIMManager manager]anIM] bindAnPushService:[[AnPush shared] getAnID] appKey:LIGHTSPEED_APP_KEY clientId:[[HXIMManager manager] clientId] success:^{
+            NSLog(@"AnIM bindAnPushService successful");
+        } failure:^(ArrownockException *exception) {
+            NSLog(@"AnIm bindAnPushService failed, error : %@", exception.getMessage);
+        }];
+    }
 }
 
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
     NSLog(@"error: %@", error);
-}
-
-#pragma mark - AnPushDelegate functions
-- (void)didRegistered:(NSString *)anid withError:(NSString *)error
-{
-    NSLog(@"Arrownock didRegistered\nError: %@", error);
-    if (error && ![error isEqualToString:@""])
-    {
-        NSLog(@"LSIM AppDelegate, AnPush failed to register, error: %@", error);
-    }
-    else if (!anid || [anid isEqualToString:@""])
-    {
-        NSLog(@"LSIM AppDelegate, AnPush failed to register, invalid Lightspeed ID");
-    }
-    else
-    {
-        /* use the anId to bind AnIM & AnPush */
-        [[[HXIMManager manager]anIM] bindAnPushService:anid appKey:LIGHTSPEED_APP_KEY deviceType:AnPushTypeiOS];
-    }
-}
-
-- (void)didUnregistered:(BOOL)success withError:(NSString *)error
-{
-    NSLog(@"Unregistration success: %@\nError: %@", success? @"YES" : @"NO", error);
-    if (!success)
-    {
-        /* do nothing */
-    }
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
@@ -122,8 +122,8 @@
         [HXIMManager manager].remoteNotificationInfo = [userInfo mutableCopy];
         
         [self resetTabBarViews];
-        if (vc.selectedIndex != 0) {
-            vc.selectedIndex = 0;
+        if (vc.selectedIndex != 1) {
+            vc.selectedIndex = 1;
         }
     }
 }
@@ -144,7 +144,11 @@
     if ([[HXIMManager manager].clientId length]) {
         [HXIMManager manager].isAppEnterBackground = YES;
         [[HXIMManager manager].anIM disconnect];
-        //[[AnPush shared]setBadge:(int)[MessageUtil getAllUnreadCount]];
+//        [[AnPush shared]setBadge:(int)[MessageUtil getAllUnreadCount] success:^{
+//            NSLog(@"AnPush setBadge successful.");
+//        } failure:^(ArrownockException *exception) {
+//            NSLog(@"AnPush failed to setBadge, error: %@", exception.getMessage);
+//        }];
     }
 }
 
@@ -154,7 +158,11 @@
     if ([[HXIMManager manager].clientId length]) {
         [HXIMManager manager].isAppEnterBackground = YES;
         [[HXIMManager manager].anIM disconnect];
-        //[[AnPush shared]setBadge:(int)[MessageUtil getAllUnreadCount]];
+//        [[AnPush shared]setBadge:(int)[MessageUtil getAllUnreadCount] success:^{
+//            NSLog(@"AnPush setBadge successful.");
+//        } failure:^(ArrownockException *exception) {
+//            NSLog(@"AnPush failed to setBadge, error: %@", exception.getMessage);
+//        }];
     }
 }
 

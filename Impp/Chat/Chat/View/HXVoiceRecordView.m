@@ -43,7 +43,7 @@
     [self addSubview:bottomBar];
     
     UIButton *cancel = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cancel setTitle:NSLocalizedString(@"取消", nil) forState:UIControlStateNormal];
+    [cancel setTitle:NSLocalizedString(@"Cancel", nil) forState:UIControlStateNormal];
     cancel.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:34/2];
     [cancel setTitleColor:[UIColor color2] forState:UIControlStateNormal];
     [cancel sizeToFit];
@@ -53,9 +53,13 @@
                               44);
     [cancel addTarget:self action:@selector(cancelButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancel];
-    
-    UIImage *voiceButtonImage = [UIImage imageNamed:@"voicepress"];
-    UIImage *selectedVoiceButtonImage = [UIImage imageNamed:@"voicepress"];
+  
+    UIImage *bImage = [UIImage imageNamed:@"voicepress"];
+    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(bImage.size.height/2-1, bImage.size.width/2-1, bImage.size.height/2+1, bImage.size.width/2+1);
+    UIImage *voiceButtonImage = [bImage resizableImageWithCapInsets:edgeInsets];
+    UIImage *selectedVoiceButtonImage = [bImage resizableImageWithCapInsets:edgeInsets];
+//    UIImage *voiceButtonImage = [UIImage imageNamed:@"voicepress"];
+//    UIImage *selectedVoiceButtonImage = [UIImage imageNamed:@"voicepress"];
     self.voiceRecordBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.voiceRecordBtn.frame = CGRectMake(12,
                                            self.frame.size.height -44,
@@ -73,7 +77,7 @@
     self.voiceBtnLabel = [[UILabel alloc]init];
     self.voiceBtnLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:24/2];
     [self.voiceBtnLabel setTextColor:[UIColor whiteColor]];
-    [self.voiceBtnLabel setText:NSLocalizedString(@"按住即可錄音", nil)];
+    [self.voiceBtnLabel setText:NSLocalizedString(@"press_to_record_message", nil)];
     [self.voiceBtnLabel sizeToFit];
 
     self.voiceBtnLabel.center = CGPointMake(self.voiceRecordBtn.bounds.size.width/2, self.voiceRecordBtn.bounds.size.height/2);
@@ -96,7 +100,7 @@
     [session setActive:YES error:nil];
     [self.voiceRecorder record];
     
-    [self.voiceBtnLabel setText:NSLocalizedString(@"放開即可傳送", nil)];
+    [self.voiceBtnLabel setText:NSLocalizedString(@"release_button_to_send", nil)];
     
     if (!self.recordingImage) {
         self.recordingImage = [[UIImageView alloc]initWithFrame:CGRectMake(self.center.x - 110/2/2, self.center.y - (28/2 + 20/2 +110/2)/2,
@@ -120,7 +124,7 @@
     
     self.recordingMessage.font = [UIFont fontWithName:@"STHeitiTC-Light" size:28/2];
     self.recordingMessage.textColor = [UIColor whiteColor];
-    self.recordingMessage.text = NSLocalizedString(@"錄音中", nil);
+    self.recordingMessage.text = NSLocalizedString(@"recording", nil);
     self.recordingMessage.textAlignment = NSTextAlignmentCenter;
     [self addSubview:self.recordingMessage];
     
@@ -132,7 +136,7 @@
     [self.voiceRecorder stop];
     
     AVAudioSession *session = [AVAudioSession sharedInstance];
-    int flags = AVAudioSessionSetActiveFlags_NotifyOthersOnDeactivation;
+    int flags = AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation;
     [session setActive:NO withFlags:flags error:nil];
     
     AVAudioPlayer* player = [[AVAudioPlayer alloc] initWithData:[[NSFileManager defaultManager]
@@ -143,8 +147,8 @@
             self.recordingAlert = [[UIImageView alloc]initWithFrame:self.recordingImage.frame];
             self.recordingAlert.image = [UIImage imageNamed:@"voice_alert"];
         }
-        self.recordingMessage.text = NSLocalizedString(@"聲音訊息過短", nil);
-        self.voiceBtnLabel.text = NSLocalizedString(@"按住即可錄音", nil);
+        self.recordingMessage.text = NSLocalizedString(@"the_message_is_too_short", nil);
+        self.voiceBtnLabel.text = NSLocalizedString(@"press_to_record_message", nil);
         [self.recordingImage removeFromSuperview];
         [self.recordingAnimation removeFromSuperview];
         [self addSubview:self.recordingAlert];
@@ -176,7 +180,7 @@
     [self.voiceRecorder stop];
     
     self.backgroundColor = [UIColor clearColor];
-    self.voiceBtnLabel.text = NSLocalizedString(@"按住即可錄音", nil);
+    self.voiceBtnLabel.text = NSLocalizedString(@"press_to_record_message", nil);
     [self.recordingImage removeFromSuperview];
     [self.recordingAnimation removeFromSuperview];
     [self.recordingAlert removeFromSuperview];
@@ -185,7 +189,7 @@
 
 - (void)voiceRecordButtonDragEnter
 {
-    self.recordingMessage.text = NSLocalizedString(@"錄音中", nil);
+    self.recordingMessage.text = NSLocalizedString(@"recording", nil);
     [self.recordingAlert removeFromSuperview];
     [self addSubview:self.recordingImage];
     [self addSubview:self.recordingAnimation];
@@ -197,7 +201,7 @@
         self.recordingAlert = [[UIImageView alloc]initWithFrame:self.recordingImage.frame];
         self.recordingAlert.image = [UIImage imageNamed:@"voice_alert"];
     }
-    self.recordingMessage.text = NSLocalizedString(@"放開以取消傳送", nil);
+    self.recordingMessage.text = NSLocalizedString(@"release_button_to_cancel", nil);
     [self.recordingImage removeFromSuperview];
     [self.recordingAnimation removeFromSuperview];
     [self addSubview:self.recordingAlert];

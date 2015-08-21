@@ -30,6 +30,7 @@
 @property (nonatomic, retain) NSSet *comments;
 @property (nonatomic, retain) NSSet *likes;
 @property (nonatomic, retain) HXUser *postOwner;
+@property (nonatomic, retain) NSString* circle_id;
 @end
 
 @interface HXPost (CoreDataGeneratedAccessors)

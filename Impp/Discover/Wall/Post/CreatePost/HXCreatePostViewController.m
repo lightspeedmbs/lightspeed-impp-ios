@@ -19,6 +19,7 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <CoreLocation/CoreLocation.h>
 #define SCREEN_WIDTH [[UIScreen mainScreen] applicationFrame].size.width
+#define SCREEN_HEIGHT [[UIScreen mainScreen] applicationFrame].size.height
 
 static NSString *photoCellIdentifier = @"PhotoCell";
 
@@ -31,6 +32,9 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
 @property (strong, nonatomic) UITapGestureRecognizer *messageTextViewTap;
 @property (strong, nonatomic) SZTextView *messageTextView;
 @property (strong, nonatomic) HXLoadingView *load;
+@property (strong, nonatomic) NSString *groupID;
+@property BOOL isGroupMode;
+@property BOOL iscallingAPI;
 @end
 
 @implementation HXCreatePostViewController
@@ -43,9 +47,27 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
     [self initNavigationBar];
     
 }
+- (instancetype)initInGroupMode:(NSString*)groupId
+{
+    self = [super init];
+    if (self) {
+        _groupID = groupId;
+        _isGroupMode = YES;
+    }
+    return self;
+}
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _isGroupMode = NO;
+    }
+    return self;
+}
 
 - (void)initData
 {
+    _iscallingAPI = NO;
     self.photosArray = [[NSMutableArray alloc]initWithCapacity:0];
     self.photoUrlsArray = [[NSMutableArray alloc]initWithCapacity:0];
     
@@ -60,10 +82,14 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
     self.view.backgroundColor = [UIColor color5];
     
     CGRect frame;
+
     self.messageTextViewTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(messageTextViewTapped)];
     self.messageTextView = [[SZTextView alloc]initWithFrame:CGRectMake(15, 15, SCREEN_WIDTH - 30, 200)];
+    if (SCREEN_HEIGHT<500) {//3.5"
+        self.messageTextView.frame = CGRectMake(15, 15, SCREEN_WIDTH - 30, 92);
+    }
     self.messageTextView.textColor = [UIColor color11];
-    self.messageTextView.placeholder = NSLocalizedString(@"撰寫貼文...", nil);
+    self.messageTextView.placeholder = NSLocalizedString(@"say_something...", nil);
     self.messageTextView.placeholderTextColor = [UIColor color8];
     self.messageTextView.font = [UIFont fontWithName:@"STHeitiTC-Light" size:16];
     self.messageTextView.backgroundColor = [UIColor clearColor];//[[UIColor redColor]colorWithAlphaComponent:0.3];
@@ -107,11 +133,11 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
 
 - (void)initNavigationBar
 {
-    [HXAppUtility initNavigationTitle:NSLocalizedString(@"新增貼文", nil) barTintColor:[UIColor color1] withViewController:self];
+    [HXAppUtility initNavigationTitle:NSLocalizedString(@"new_post", nil) barTintColor:[UIColor color1] withViewController:self];
     
     UIButton *finishButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [finishButton addTarget:self action:@selector(finishButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [finishButton setTitle:NSLocalizedString(@"發佈", nil) forState:UIControlStateNormal];
+    [finishButton setTitle:NSLocalizedString(@"post", nil) forState:UIControlStateNormal];
     [finishButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [finishButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
     [finishButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.3] forState:UIControlStateDisabled];
@@ -123,7 +149,7 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
     
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [cancelButton addTarget:self action:@selector(cancelButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [cancelButton setTitle:NSLocalizedString(@"取消", nil) forState:UIControlStateNormal];
+    [cancelButton setTitle:NSLocalizedString(@"Cancel", nil) forState:UIControlStateNormal];
     [cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [cancelButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
     cancelButton.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:34/2];
@@ -152,56 +178,81 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
 
 - (void)finishButtonTapped
 {
-    [self.messageTextView resignFirstResponder];
-    
-    self.load = [[HXLoadingView alloc]initLoadingView];
-    [self.view addSubview:self.load];
-    
-    [self.photoUrlsArray removeAllObjects];
-    
-    // lastObject is tapped button
-    if (self.photosArray.count > 1) {
-        for (int i= 0; i < self.photosArray.count - 1; i++) {
-            [self uploadPhotoToServer:self.photosArray[i] Success:^(NSDictionary* response){
-                
-                [self.photoUrlsArray addObject:[response[@"response"][@"photo"][@"url"] mutableCopy]];
-                if (self.photoUrlsArray.count == self.photosArray.count - 1) {
-                    [self createPost];
-                }
-            } failure:^(NSDictionary* response){
-                
-            }];
+    if (!_iscallingAPI) {
+        [self.messageTextView resignFirstResponder];
+        
+        self.load = [[HXLoadingView alloc]initLoadingView];
+        [self.view addSubview:self.load];
+        
+        [self.photoUrlsArray removeAllObjects];
+        
+        // lastObject is tapped button
+        if (self.photosArray.count > 1) {
+            for (int i= 0; i < self.photosArray.count - 1; i++) {
+                [self uploadPhotoToServer:self.photosArray[i] Success:^(NSDictionary* response){
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.photoUrlsArray addObject:[response[@"response"][@"photo"][@"url"] mutableCopy]];
+                        if (self.photoUrlsArray.count == self.photosArray.count - 1) {
+                            [self createPost];
+                        }
+                    });
+                    
+                } failure:^(NSDictionary* response){
+                    
+                }];
+            }
+        }else if (![[HXAppUtility removeExtraWhitespace:self.messageTextView.text] isEqualToString:@""]){
+            [self createPost];
         }
-    }else if (![[HXAppUtility removeExtraWhitespace:self.messageTextView.text] isEqualToString:@""]){
-        [self createPost];
     }
+
     
 }
 
 - (void)createPost
 {
+    _iscallingAPI = YES;
+    NSMutableDictionary *params;
     
-    NSMutableDictionary *params = [@{@"title":@"_EMPTY_",
-                                     @"type":@"normal",
-                                     @"user_id":[HXUserAccountManager manager].userId,
-                                     @"wall_id":LIGHTSPEED_WALL_ID,
-                                     @"content":self.messageTextView.text}mutableCopy];
-    if (self.photosArray.count > 1) {
-        
-        NSString *photoUrls = [self.photoUrlsArray componentsJoinedByString:@","];
-        NSDictionary *customData = @{@"photoUrls":photoUrls};
-        [params setObject:customData forKey:@"custom_fields"];
+    
+    if (_isGroupMode) {
+        NSMutableDictionary *custom = [[NSMutableDictionary alloc]init];
+        if (self.photosArray.count > 1) {
+            NSString *photoUrls = [self.photoUrlsArray componentsJoinedByString:@","];
+            [custom setObject:photoUrls forKey:@"photoUrls"];
+        }
+        [custom setObject:_groupID forKey:@"circle_id"];
+        params = [@{@"title":@"_EMPTY_",
+                    @"type":@"normal",
+                    @"user_id":[HXUserAccountManager manager].userId,
+                    @"custom_fields":custom,
+                    @"content":self.messageTextView.text}mutableCopy];
+    }else{
+        params = [@{@"title":@"_EMPTY_",
+                    @"type":@"normal",
+                    @"user_id":[HXUserAccountManager manager].userId,
+                    @"wall_id":LIGHTSPEED_WALL_ID,
+                    @"content":self.messageTextView.text}mutableCopy];
+        if (self.photosArray.count > 1) {
+            NSString *photoUrls = [self.photoUrlsArray componentsJoinedByString:@","];
+            NSDictionary *customData = @{@"photoUrls":photoUrls};
+            [params setObject:customData forKey:@"custom_fields"];
+        }
     }
+    
+    
     
     [[HXAnSocialManager manager]sendRequest:@"posts/create.json" method:AnSocialManagerPOST params:params success:^(NSDictionary *response){
         NSLog(@"post data :%@",[response description]);
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            _iscallingAPI = NO;
             [self.load loadCompleted];
             [self successPost];
         });
         
     } failure:^(NSDictionary *response){
+        _iscallingAPI = NO;
         [self.load removeFromSuperview];
         NSLog(@"fail to post data :%@",[response description]);
     }];
@@ -270,10 +321,10 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
         //[self selectPhoto];
         [self.messageTextView resignFirstResponder];
         
-        NSString *button1 = NSLocalizedString(@"拍攝照片", nil);
-        NSString *button2 = NSLocalizedString(@"選取照片", nil);
+        NSString *button1 = NSLocalizedString(@"camera", nil);
+        NSString *button2 = NSLocalizedString(@"choose_a_photo", nil);
     
-        NSString *cancelTitle = NSLocalizedString(@"取消", nil);
+        NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
         UIActionSheet *actionSheet = [[UIActionSheet alloc]
                                       initWithTitle:nil
                                       delegate:self
@@ -361,7 +412,7 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
     [viewController.navigationItem setTitle:@""];
     viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor whiteColor];
     viewController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:NSLocalizedString(@"取消", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelBarButtonTapped)];
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelBarButtonTapped)];
     viewController.navigationItem.rightBarButtonItem = cancelButton;
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
 }
@@ -390,9 +441,7 @@ UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegat
         failure(response);
         NSLog(@"fail to post data :%@",[response description]);
     }];
-    
-    
-    
+
 }
 
 - (void)showSelectedPhoto:(UIImage *)image

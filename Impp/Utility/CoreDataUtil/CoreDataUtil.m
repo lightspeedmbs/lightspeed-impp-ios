@@ -151,6 +151,7 @@
         
         // create context
         context = [[NSManagedObjectContext alloc] init];
+        [context setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
         [context setPersistentStoreCoordinator:psc];
         
     });

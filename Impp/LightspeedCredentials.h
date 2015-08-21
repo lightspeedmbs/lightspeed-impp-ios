@@ -9,6 +9,10 @@
 #ifndef IMChat_LightspeedCredentials_h
 #define IMChat_LightspeedCredentials_h
 
-#define LIGHTSPEED_APP_KEY @"" 
-#define LIGHTSPEED_WALL_ID @""
+#define LIGHTSPEED_APP_KEY @"" /* Your Lightspeed app key*/
+#define LIGHTSPEED_WALL_ID @"" /* Your Lightspeed social wall id */
+
+#define LIGHTSPEED_DEFAULT_FRIEND_ID @"" /* feature */
+#define TESTIN_APM_ID @"" /* feature */
+
 #endif

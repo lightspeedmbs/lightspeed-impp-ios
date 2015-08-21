@@ -48,7 +48,7 @@
 
 - (void)initView
 {
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor blackColor];
     
     self.scrollView = [[UIScrollView alloc]initWithFrame:self.view.frame];
     self.scrollView.bouncesZoom = YES;
@@ -109,7 +109,7 @@
 
 - (void)initNavigationBar
 {
-    NSString *title = [self.mode isEqualToString:@"push"] ? NSLocalizedString(@"查看照片", nil) : @"";
+    NSString *title = [self.mode isEqualToString:@"push"] ? NSLocalizedString(@"view_photo", nil) : @"";
     [HXAppUtility initNavigationTitle:title barTintColor:[UIColor color1] withViewController:self];
     
     if([self.mode isEqualToString:@"modal"]){

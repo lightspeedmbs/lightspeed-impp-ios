@@ -37,6 +37,8 @@
     self.messages = [NSSet set];
     self.users = [NSSet set];
     self.topicOwner = nil;
+    
+    self.isAnRoomChat = @"";
 }
 
 - (BOOL)setValuesFromDict:(NSDictionary *)dict
@@ -71,6 +73,10 @@
     if ([HXChat isObjectAvailable:dict[@"users"]])
         self.users = dict[@"users"];
     
+    if ([HXChat isObjectAvailable:dict[@"isAnRoomChat"]])
+        self.isAnRoomChat = dict[@"isAnRoomChat"];
+    
+    
     NSError *error;
     [[CoreDataUtil sharedContext] save:&error];
     if (error) {
@@ -89,6 +95,7 @@
                            @"currentUserName":self.currentUserName,
                            @"currentClientId":self.currentClientId,
                            @"lastMsgId":self.lastMsgId,
+                           @"isAnRoomChat":self.isAnRoomChat ? self.isAnRoomChat:@"",
                            @"updatedTimestamp":self.updatedTimestamp};
     return dict;
 }

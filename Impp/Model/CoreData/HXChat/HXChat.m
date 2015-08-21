@@ -12,6 +12,7 @@
 
 
 @implementation HXChat
+@dynamic isAnRoomChat;
 
 @dynamic currentClientId;
 @dynamic currentUserName;

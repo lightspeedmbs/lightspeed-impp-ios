@@ -7,6 +7,7 @@
 //
 
 #import "ChatUtil.h"
+#import "HXUserAccountManager.h"
 #import "CoreDataUtil.h"
 #import "HXIMManager.h"
 #import "HXUser+Additions.h"
@@ -15,25 +16,31 @@
 #import "NotificationCenterUtil.h"
 @implementation ChatUtil
 
-+ (HXChat *)createChatSessionWithUser:(NSArray *)users topicId:(NSString *)topicId topicName:(NSString *)topicName currentUserName:(NSString *)currentUserName topicOwnerClientId:(NSString *)topicOwnerClientId
++ (HXChat *)createChatSessionWithUser:(NSSet *)users topicId:(NSString *)topicId topicName:(NSString *)topicName currentUserName:(NSString *)currentUserName topicOwnerClientId:(NSString *)topicOwnerClientId
 {
     HXChat *chatSession = [ChatUtil getChatSessionByTopicId:topicId];
     if (chatSession == nil) {
         
-        NSDictionary *dic = @{@"currentUserName":currentUserName,
+        NSDictionary *dic = @{@"currentUserName":currentUserName ? currentUserName:[HXUserAccountManager manager].userName,
                               @"topicName":topicName,
                               @"topicId":topicId,
                               @"currentClientId":[HXIMManager manager].clientId};
         chatSession = [HXChat initWithDict:dic];
         
+//        for (NSString *userid in users) {
+//            HXUser *userInTopic = [UserUtil getHXUserByUserId:userid];
+//            [chatSession addUsersObject:userInTopic];
+//        }
+        
         if (users) {
-            [chatSession addUsers:[NSSet setWithArray:users]];
+
+            [chatSession addUsers:users];
         }
        
         HXUser *currentUser = [UserUtil getHXUserByClientId:[HXIMManager manager].clientId];
         [currentUser addTopicsObject:chatSession];
-        NSLog(@"create topic %@",[chatSession description]);
-        NSLog(@"by currentUser %@",[currentUser description]);
+        //NSLog(@"create topic %@",[chatSession description]);
+        //NSLog(@"by currentUser %@",[currentUser description]);
     }else{
         /* update info */
         chatSession.topicName = topicName;
@@ -44,20 +51,32 @@
             if (chatSession.users.count) {
                 NSSet *oldUsers = chatSession.users;
                 [chatSession removeUsers:oldUsers];
-                [chatSession addUsers:[NSSet setWithArray:users]];
+                [chatSession addUsers:users];
             }else{
-               [chatSession addUsers:[NSSet setWithArray:users]];
+               [chatSession addUsers:users];
             }
         }
     }
     
+    if (([topicOwnerClientId isKindOfClass:[NSNull class]]||(topicOwnerClientId == nil))  && (topicId!=nil)) {
+        chatSession.isAnRoomChat = @"_ANROOM_";
+    }else{
+        chatSession.isAnRoomChat = @"";
+    }
+    
     /* update topic owner */
     if ((topicOwnerClientId != nil) && ![topicOwnerClientId isKindOfClass:[NSNull class]]) {
-        HXUser *topicOwner = [UserUtil getHXUserByClientId:topicOwnerClientId];
-        if (topicOwner == nil) {
-            topicOwner = [HXUser initWithDict:@{@"clientId":topicOwnerClientId,
-                                                @"userName":@"unknown"}];
+        HXUser *topicOwner;
+//        if ([topicOwnerClientId isEqualToString:@"_ANROOM_"] && (topicId!=nil)) {
+//            chatSession.isAnRoomChat = @"_ANROOM_";
+//        }else{
+            topicOwner = [UserUtil getHXUserByClientId:topicOwnerClientId];
+            if (topicOwner == nil) {
+                topicOwner = [HXUser initWithDict:@{@"clientId":topicOwnerClientId,
+                                                    @"userName":@"unknown"}];
+            //}
         }
+        
         chatSession.topicOwner = topicOwner;
     }
     
@@ -157,7 +176,6 @@
         if ([chat.currentUserName isEqualToString:@""] || [chat.targetUserName isEqualToString:@""]) {
             chat.currentUserName = currentUserName;
             chat.targetUserName = targetUserName;
-        
             
         }
         if (!chat.users || !chat.users.count) {
@@ -195,7 +213,7 @@
                                          :@"targetClientId == %@ && currentClientId == %@", clientIds[1], clientIds[0]]];
     }
     for(HXChat* cs in results){
-        NSLog(@"chat: %@", [cs toDict]);
+        //NSLog(@"chat: %@", [cs toDict]);
     }
     
     if (results.count > 1) {
@@ -215,7 +233,7 @@
                           predicate:[NSPredicate predicateWithFormat
                                      :@"currentClientId == %@", clientId]];
     for(HXChat* cs in results){
-        NSLog(@"chat: %@", [cs toDict]);
+        //NSLog(@"chat: %@", [cs toDict]);
     }
     
     if (results.count > 1) {
@@ -235,7 +253,7 @@
                           predicate:[NSPredicate predicateWithFormat
                                      :@"currentClientId == %@ && targetClientId == %@", clientId, targetClientId]];
     for(HXChat* cs in results){
-        NSLog(@"chat: %@", [cs toDict]);
+        //NSLog(@"chat: %@", [cs toDict]);
     }
     
     if (results.count > 1) {
@@ -255,7 +273,7 @@
                           predicate:[NSPredicate predicateWithFormat
                                      :@"%K == %@", @"clientId", clientId]];
     for(HXChat* cs in results){
-        NSLog(@"chat: %@", [cs toDict]);
+        //NSLog(@"chat: %@", [cs toDict]);
     }
     
     if (results.count > 1) {
@@ -275,7 +293,7 @@
                           predicate:[NSPredicate predicateWithFormat
                                      :@"topicId == %@ && currentClientId == %@",topicId, [HXIMManager manager].clientId]];
     for(HXChat* cs in results){
-        NSLog(@"chat exist!! chat info: %@", [cs toDict]);
+        //NSLog(@"chat exist!! chat info: %@", [cs toDict]);
     }
     
     if (results.count > 1) {
@@ -308,8 +326,8 @@
     NSArray* results =
     [CoreDataUtil getWithEntityName:@"HXMessage"
                           predicate:[NSPredicate predicateWithFormat:
-                                     @"self IN %@ && from != %@ && readACK == %d",
-                                     chatSession.messages,[HXIMManager manager].clientId,0]];
+                                     @"self IN %@ && from != %@ && readACK == %d && chat.currentClientId == %@ ",
+                                     chatSession.messages,[HXIMManager manager].clientId,0,[HXIMManager manager].clientId]];
     return results.count;
 }
 
@@ -365,6 +383,7 @@
     [CoreDataUtil deleteAllWithEntityName:@"HXMessage"
                                 predicate:[NSPredicate predicateWithFormat:@"self IN %@",chat.messages]];
     [[NSNotificationCenter defaultCenter]postNotificationName:DeleteChatHistory object:nil];
+    [[NSNotificationCenter defaultCenter]postNotificationName:RefreshChatHistory object:nil];
 }
 
 + (void)deleteChat:(HXChat *)chat

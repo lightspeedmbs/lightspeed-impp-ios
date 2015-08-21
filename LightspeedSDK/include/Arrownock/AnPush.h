@@ -101,7 +101,17 @@
  * @param delegate AnPushDelegate 的实例
  * @param secure 是否使用安全传输方式 <br/> - YES 安全 <br/> - NO 非安全
  */
-+ (void)setup:(NSString *)appKey deviceToken:(NSData *)deviceToken delegate:(id <AnPushDelegate>)delegate secure:(BOOL)secure;
++ (void)setup:(NSString *)appKey deviceToken:(NSData *)deviceToken delegate:(id <AnPushDelegate>)delegate secure:(BOOL)secure __attribute__((deprecated("Use setup:appKey deviceToken secure instead.")));
+
+
+/**
+ * 初始化 AnPush 实例
+ *
+ * @param appKey 应用的密匙(App Key)，可在管理控制台获取
+ * @param deviceToken 应用的推送唯一码(Device Token)
+ * @param secure 是否使用安全传输方式 <br/> - YES 安全 <br/> - NO 非安全
+ */
++ (void)setup:(NSString *)appKey deviceToken:(NSData *)deviceToken secure:(BOOL)secure;
 
 /**
  * 设备注册
@@ -109,57 +119,76 @@
  * @param channels 要注册的一个或多个推送渠道
  * @param overwrite 是否覆盖已注册的渠道 <br/> - YES 覆盖(所有已注册过的渠道将被本次的渠道所覆盖) <br/> - NO 不覆盖(本次注册渠道将增加到设备已注册的渠道列表中)
  */
-- (void)register:(NSArray *)channels overwrite:(BOOL)overwrite;
+- (void)register:(NSArray *)channels overwrite:(BOOL)overwrite __attribute__((deprecated("Use register:channels overwrite success failure instead.")));
+- (void)register:(NSArray *)channels overwrite:(BOOL)overwrite success:(void (^)(NSString *anid))success failure:(void (^)(ArrownockException *exception))failure;
+
+/**
+ * 启动推送服务
+ */
+- (void)enable;
+
+/**
+ * 取消推送服务
+ */
+- (void)disable;
 
 /**
  * 设备注销
  * 注销已注册的所有渠道
  */
-- (void)unregister;
+- (void)unregister __attribute__((deprecated("Use unregister:success failure instead.")));
+- (void)unregister:(void (^)(NSString *anid))success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 设备注销
  * 注销指定推送渠道
  * @param channels 要注销的一个或多个推送渠道
  */
-- (void)unregister:(NSArray *)channels;
+- (void)unregister:(NSArray *)channels __attribute__((deprecated("Use unregister:channels success failure instead.")));
+- (void)unregister:(NSArray *)channels success:(void (^)(NSString *anid))success failure:(void (^)(ArrownockException *exception))failure;
 
-- (void)setBadge:(int)number;
+- (void)setBadge:(int)number __attribute__((deprecated("Use setMute:number success failure instead.")));
+- (void)setBadge:(int)number success:(void (^)())success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 设置静默推送
  * 所有接收到的推送消息均采用静音方式
  */
-- (void)setMute;
+- (void)setMute __attribute__((deprecated("Use setMute:success failure instead.")));
+- (void)setMute:(void (^)())success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 设置静默推送及适用时段
  * 所有接收到的推送消息在某一时间段内均采用静音方式
  * @param startHour 静默推送的开始时间(小时)
  * @param minute 静默推送的开始时间(分钟)
- * @param duration 静默推送的持续时长(秒)
+ * @param duration 静默推送的持续时长(分钟)
  */
-- (void)setMuteWithHour:(NSInteger)startHour minute:(NSInteger)startMinute duration:(NSInteger)duration;
+- (void)setMuteWithHour:(NSInteger)startHour minute:(NSInteger)startMinute duration:(NSInteger)duration __attribute__((deprecated("Use setMuteWithHour:startHour startMinute duration success failure instead.")));
+- (void)setMuteWithHour:(NSInteger)startHour minute:(NSInteger)startMinute duration:(NSInteger)duration success:(void (^)())success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 取消静默推送设置
  */
-- (void)clearMute;
+- (void)clearMute __attribute__((deprecated("Use clearMute:success failure instead.")));
+- (void)clearMute:(void (^)())success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 设置免打扰模式及适用时段
  * 在设置时间段内将不会有任何推送消息
  * @param startHour 免打扰模式的开始时间(小时)
  * @param minute 免打扰模式的开始时间(分钟)
- * @param duration 免打扰模式的持续时长(秒)
+ * @param duration 免打扰模式的持续时长(分钟)
  * @param resend 是否重发推送消息 <br/> 在免打扰时段内如果有推送消息，可使用此参数设置是否在时段结束后重新推送该消息 <br/> YES - 重新发送  <br/> NO - 不发送 (该消息将丢失)
  */
-- (void)setSilentWithHour:(NSInteger)startHour minute:(NSInteger)startMinute duration:(NSInteger)duration resend:(BOOL)resend;
+- (void)setSilentWithHour:(NSInteger)startHour minute:(NSInteger)startMinute duration:(NSInteger)duration resend:(BOOL)resend __attribute__((deprecated("Use setSilentWithHour:startHour startMinute duration resend success failure instead.")));
+- (void)setSilentWithHour:(NSInteger)startHour minute:(NSInteger)startMinute duration:(NSInteger)duration resend:(BOOL)resend success:(void (^)())success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 取消静默推送设置
  */
-- (void)clearSilent;
+- (void)clearSilent __attribute__((deprecated("Use clearSilent:success failure instead.")));
+- (void)clearSilent:(void (^)())success failure:(void (^)(ArrownockException *exception))failure;
 
 /**
  * 获取设备ID

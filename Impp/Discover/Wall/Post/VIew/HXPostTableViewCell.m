@@ -43,6 +43,7 @@
 @property (strong, nonatomic) HXLikeCommentButton *commentButton;
 @property (strong, nonatomic) HXLikeCommentButton *likeButton;
 @property (strong, nonatomic) NSIndexPath *index;
+@property BOOL isRoomPost;
 @end
 
 @implementation HXPostTableViewCell
@@ -74,7 +75,19 @@
     if (self)
     {
         self.postInfo = postInfo;
-        
+        _isRoomPost = NO;
+        [self initView];
+    }
+    return self;
+}
+- (id)initWithRoomPostInfo:(NSDictionary *)postInfo
+       reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self)
+    {
+        self.postInfo = postInfo;
+        _isRoomPost = YES;
         [self initView];
     }
     return self;
@@ -104,9 +117,9 @@
     UITapGestureRecognizer *photoTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(photoTapped)];
     [self.profilePhoto addGestureRecognizer:photoTap];
     
-    if (self.postInfo[@"photoURL"]) {
+    if (self.postInfo[@"user"][@"photoURL"]) {
         SDWebImageManager *manager = [SDWebImageManager sharedManager];
-        [manager downloadWithURL:[NSURL URLWithString:self.postInfo[@"photoURL"]]
+        [manager downloadWithURL:[NSURL URLWithString:self.postInfo[@"user"][@"photoURL"]]
                          options:0
                         progress:^(NSInteger receivedSize, NSInteger expectedSize){}
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished){
@@ -117,6 +130,19 @@
                            
                        }];
     }
+//    }else if (_postInfo[@"custom_fields"][@"photoUrls"]){
+//        SDWebImageManager *manager = [SDWebImageManager sharedManager];
+//        [manager downloadWithURL:[NSURL URLWithString:self.postInfo[@"custom_fields"][@"photoUrls"]]
+//                         options:0
+//                        progress:^(NSInteger receivedSize, NSInteger expectedSize){}
+//                       completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished){
+//                           if (image) {
+//                               self.profilePhoto.image = image;
+//                               self.profilePhoto.contentMode = UIViewContentModeScaleAspectFill;
+//                           }
+//                           
+//                       }];
+//    }
     [self.contentView addSubview:self.profilePhoto];
     
     
@@ -124,7 +150,7 @@
     /*
      Name label
      */
-    NSString *userName = self.postInfo[@"userName"];
+    NSString *userName = self.postInfo[@"user"][@"username"];
     self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.profilePhoto.frame.origin.x + self.profilePhoto.frame.size.width + 10,
                                                                self.profilePhoto.frame.origin.y + (self.profilePhoto.frame.size.height - 16)/2 ,
                                                                SCREEN_WIDTH - self.profilePhoto.frame.origin.x - self.profilePhoto.frame.size.width - 10 -15, 16)];
@@ -210,6 +236,28 @@
         frame.size = CGSizeMake(SCREEN_WIDTH - 15, 108);
         frame.origin.x = 15;
         self.collectionView.frame = frame;
+    }else if (self.postInfo[@"photoURL"]){
+        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+        //layout.sectionInset = UIEdgeInsetsMake(10, 10, 9, 10);
+        layout.minimumInteritemSpacing = 1;
+        layout.minimumLineSpacing = 1;
+        layout.itemSize = CGSizeMake(108, 108);
+        layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        self.collectionView = [[HXIndexedCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+        [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:CollectionViewCellIdentifier];
+        self.collectionView.backgroundColor = [UIColor clearColor];
+        self.collectionView.showsHorizontalScrollIndicator = NO;
+        [self.contentView addSubview:self.collectionView];
+        
+        frame = self.collectionView.frame;
+        if (content)
+            frame.origin.y = self.messageLabel.frame.origin.y + self.messageLabel.frame.size.height + 20/2;
+        else
+            frame.origin.y = self.profilePhoto.frame.origin.y + self.profilePhoto.frame.size.height + 10;
+        
+        frame.size = CGSizeMake(SCREEN_WIDTH - 15, 108);
+        frame.origin.x = 15;
+        self.collectionView.frame = frame;
     }
     
     
@@ -218,7 +266,7 @@
      Like button
      */
     
-    NSString* likeStr = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"讚", nil),(int)[(NSNumber *)self.postInfo[@"likeCount"] intValue]];
+    NSString* likeStr = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"like", nil),(int)[(NSNumber *)self.postInfo[@"likeCount"] intValue]];
     if (![[HXUserAccountManager manager].likeDic objectForKey:self.postInfo[@"id"]])
         self.likeButton = [[HXLikeCommentButton alloc]initWithTitle:likeStr tintColor:[UIColor color1] image:[UIImage imageNamed:@"unlike"]];
     else
@@ -249,7 +297,7 @@
      Comment button
      */
     //NSString *commentStr = [NSString stringWithFormat:@"留言%d",(int)[(NSNumber *)self.postInfo[@"commentCount"] intValue]];
-    self.commentButton = [[HXLikeCommentButton alloc]initWithTitle:NSLocalizedString(@"留言", nil) tintColor:[UIColor color1] image:[UIImage imageNamed:@"comment"]];
+    self.commentButton = [[HXLikeCommentButton alloc]initWithTitle:NSLocalizedString(@"comment", nil) tintColor:[UIColor color1] image:[UIImage imageNamed:@"comment"]];
     [self.commentButton addTarget:self action:@selector(commentButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.commentButton setFrame:CGRectMake(self.likeButton.frame.size.width + self.likeButton.frame.origin.x + 6,
                                             self.likeButton.frame.origin.y,
@@ -280,7 +328,7 @@
 - (void)deleteLike
 {
 
-    NSString* likeStr = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"讚", nil),(int)[(NSNumber *)self.postInfo[@"likeCount"] intValue]-1];
+    NSString* likeStr = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"like", nil),(int)[(NSNumber *)self.postInfo[@"likeCount"] intValue]-1];
     [self.likeButton updateTitle:likeStr tintColor:[UIColor color1] image:[UIImage imageNamed:@"unlike"]];
     
     if ([(NSNumber *)self.postInfo[@"likeCount"] integerValue] - 1)
@@ -310,9 +358,12 @@
 {
     
     /* send notice */
-    [[HXIMManager manager] sendSocialNoticeWithClientId:[NSSet setWithObject:self.postInfo[@"clientId"]] objectType:@"like" objectInfo:self.postInfo notificationAlert:[NSString stringWithFormat:@"%@ 在你的貼文點讚",[HXUserAccountManager manager].userInfo.userName]];
+    if (!_isRoomPost) {
+        [[HXIMManager manager] sendSocialNoticeWithClientId:[NSSet setWithObject:self.postInfo[@"user"][@"clientId"]] objectType:@"like" objectInfo:self.postInfo notificationAlert:[NSString stringWithFormat:@"%@ 在你的貼文點讚",[HXUserAccountManager manager].userInfo.userName]];
+    }
     
-    NSString* likeStr = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"讚", nil),(int)[(NSNumber *)self.postInfo[@"likeCount"] intValue]+1];
+    
+    NSString* likeStr = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"like", nil),(int)[(NSNumber *)self.postInfo[@"likeCount"] intValue]+1];
     [self.likeButton updateTitle:likeStr tintColor:[UIColor redColor] image:[UIImage imageNamed:@"like"]];
     
     if ([(NSNumber *)self.postInfo[@"likeCount"] integerValue] + 1)
@@ -378,7 +429,7 @@
 
 - (void)photoTapped
 {
-    HXUser * user = [UserUtil getHXUserByClientId:self.postInfo[@"clientId"]];
+    HXUser * user = [UserUtil getHXUserByClientId:self.postInfo[@"user"][@"clientId"]];
     HXFriendProfileViewController *vc = [[HXFriendProfileViewController alloc]initWithUserInfo:user withViewController:[self viewController]];
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
     [[self viewController] presentViewController:nav animated:YES completion:nil];

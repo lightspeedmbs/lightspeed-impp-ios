@@ -29,4 +29,6 @@
 @dynamic processStatus;
 @dynamic chat;
 
+@dynamic senderPhotoUrl;
+
 @end

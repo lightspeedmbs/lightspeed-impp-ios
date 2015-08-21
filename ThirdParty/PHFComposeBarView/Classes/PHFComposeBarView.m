@@ -175,7 +175,7 @@ static CGFloat kTextViewToSuperviewHeightDelta;
 @synthesize buttonTitle = _buttonTitle;
 - (NSString *)buttonTitle {
     if (!_buttonTitle)
-        _buttonTitle = NSLocalizedString(@"傳送", nil);
+        _buttonTitle = NSLocalizedString(@"send" , nil);
     
     return _buttonTitle;
 }
@@ -299,10 +299,13 @@ static CGFloat kTextViewToSuperviewHeightDelta;
 //        frame = self.toolBarBackgroundImage.frame;
 //        frame.size = self.bounds.size;
 //        self.toolBarBackgroundImage.frame = frame;
-        
-        self.toolBarBackgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"compose"]];
+
+        UIImage *bImage = [UIImage imageNamed:@"compose"];
+        UIEdgeInsets edgeInsets = UIEdgeInsetsMake(bImage.size.height/2-1, bImage.size.width/2-1, bImage.size.height/2+1, bImage.size.width/2+1);
+        self.toolBarBackgroundImage = [[UIImageView alloc] initWithImage:[bImage resizableImageWithCapInsets:edgeInsets]];
+//        self.toolBarBackgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"compose"]];
         UILabel *sendlabel = [[UILabel alloc]init];
-        sendlabel.text = NSLocalizedString(@"傳送", nil);
+        sendlabel.text = NSLocalizedString(@"send" , nil);
         [sendlabel setFont:[UIFont fontWithName:@"STHeitiTC-Light" size:15]];
         [sendlabel sizeToFit];
         
@@ -626,7 +629,11 @@ static CGFloat kTextViewToSuperviewHeightDelta;
             break;
         }
     }
+    
     newButtonFrame.size.width += buttonLabelWidth + 12*2;
+    if (newButtonFrame.size.width < 54) {
+        newButtonFrame.size.width = 54;
+    }
     newButtonFrame.size.height = 44;
     newButtonFrame.origin.y = 0;
     newButtonFrame.origin.x = self.bounds.size.width -newButtonFrame.size.width;
@@ -700,13 +707,22 @@ static CGFloat kTextViewToSuperviewHeightDelta;
 }
 
 - (CGFloat)textHeight {
-    //    UITextView *textView = [self textView];
-    UITextView *copiedTextView = [[UITextView alloc] initWithFrame:self.textView.frame];
-    copiedTextView.text = self.textView.text;
-    CGFloat height = [copiedTextView sizeThatFits:CGSizeMake([copiedTextView frame].size.width, FLT_MAX)].height;
+    UITextView *textView = [self textView];
+    //    UITextView *copiedTextView = [[UITextView alloc] initWithFrame:self.textView.frame];
+    //    copiedTextView.text = self.textView.text;
+    CGFloat height = [textView sizeThatFits:CGSizeMake([textView frame].size.width, FLT_MAX)].height;
     
     return ceilf(height);
 }
+//
+//- (CGFloat)textHeight {
+//    //    UITextView *textView = [self textView];
+//    UITextView *copiedTextView = [[UITextView alloc] initWithFrame:self.textView.frame];
+//    copiedTextView.text = self.textView.text;
+//    CGFloat height = [copiedTextView sizeThatFits:CGSizeMake([copiedTextView frame].size.width, FLT_MAX)].height;
+//    
+//    return ceilf(height);
+//}
 
 - (void)updateButtonEnabled {
     BOOL enabled = [self isEnabled] && [[[self textView] text] length] > 0;

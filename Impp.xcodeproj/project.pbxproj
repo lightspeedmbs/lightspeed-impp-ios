@@ -47,14 +47,6 @@
 		135FD2361ACBFF0900FB3BDD /* HXVoiceRecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 135FD2321ACBFF0900FB3BDD /* HXVoiceRecordView.m */; };
 		13A7E5631ADCB8A300AC0C29 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 13A7E5651ADCB8A300AC0C29 /* Localizable.strings */; };
 		13A7E56A1ADE259900AC0C29 /* HXChat.m in Sources */ = {isa = PBXBuildFile; fileRef = 13A7E5691ADE259900AC0C29 /* HXChat.m */; };
-		13A7E5821ADE99A300AC0C29 /* libanLive-arm64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E56D1ADE99A300AC0C29 /* libanLive-arm64.a */; };
-		13A7E5831ADE99A300AC0C29 /* libanLive-armv7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E56E1ADE99A300AC0C29 /* libanLive-armv7.a */; };
-		13A7E5841ADE99A300AC0C29 /* libanLive-i386.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E56F1ADE99A300AC0C29 /* libanLive-i386.a */; };
-		13A7E5851ADE99A300AC0C29 /* libLightspeed-arm64-2.22.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E57D1ADE99A300AC0C29 /* libLightspeed-arm64-2.22.a */; };
-		13A7E5861ADE99A300AC0C29 /* libLightspeed-armv7-2.22.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E57E1ADE99A300AC0C29 /* libLightspeed-armv7-2.22.a */; };
-		13A7E5871ADE99A300AC0C29 /* libLightspeed-armv7s-2.22.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E57F1ADE99A300AC0C29 /* libLightspeed-armv7s-2.22.a */; };
-		13A7E5881ADE99A300AC0C29 /* libLightspeed-i386-2.22.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E5801ADE99A300AC0C29 /* libLightspeed-i386-2.22.a */; };
-		13A7E5891ADE99A300AC0C29 /* libLightspeed-x86_64-2.22.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A7E5811ADE99A300AC0C29 /* libLightspeed-x86_64-2.22.a */; };
 		13D4BCE51AD3A5A60059FF4A /* HXComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 13D4BCE41AD3A5A60059FF4A /* HXComment.m */; };
 		13D4BCE81AD3A5C50059FF4A /* HXLike.m in Sources */ = {isa = PBXBuildFile; fileRef = 13D4BCE71AD3A5C50059FF4A /* HXLike.m */; };
 		13D4BCEB1AD3A5DD0059FF4A /* HXPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 13D4BCEA1AD3A5DD0059FF4A /* HXPost.m */; };
@@ -69,6 +61,34 @@
 		13D4BD1D1AD6457E0059FF4A /* HXRoundButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 13D4BD1C1AD6457E0059FF4A /* HXRoundButton.m */; };
 		13D4BD201AD6715A0059FF4A /* HXChatHistoryTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 13D4BD1F1AD6715A0059FF4A /* HXChatHistoryTableViewCell.m */; };
 		13D4BD241AD7BB400059FF4A /* HXFriendProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 13D4BD231AD7BB400059FF4A /* HXFriendProfileViewController.m */; };
+		6761F9E21B6B790900923FB8 /* UIColor+KVNContrast.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761F9D61B6B790900923FB8 /* UIColor+KVNContrast.m */; };
+		6761F9E31B6B790900923FB8 /* UIImage+KVNEmpty.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761F9D81B6B790900923FB8 /* UIImage+KVNEmpty.m */; };
+		6761F9E41B6B790900923FB8 /* UIImage+KVNImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761F9DA1B6B790900923FB8 /* UIImage+KVNImageEffects.m */; };
+		6761F9E51B6B790900923FB8 /* KVNProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761F9DD1B6B790900923FB8 /* KVNProgress.m */; };
+		6761F9E61B6B790900923FB8 /* KVNProgressConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761F9DF1B6B790900923FB8 /* KVNProgressConfiguration.m */; };
+		6761F9E71B6B790900923FB8 /* KVNProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6761F9E11B6B790900923FB8 /* KVNProgressView.xib */; };
+		679AE14C1B7C6F17008F401C /* libanLive-arm64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE1371B7C6F17008F401C /* libanLive-arm64.a */; };
+		679AE14D1B7C6F17008F401C /* libanLive-armv7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE1381B7C6F17008F401C /* libanLive-armv7.a */; };
+		679AE14E1B7C6F17008F401C /* libanLive-i386.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE1391B7C6F17008F401C /* libanLive-i386.a */; };
+		679AE14F1B7C6F17008F401C /* libLightspeed-arm64-2.23.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE1471B7C6F17008F401C /* libLightspeed-arm64-2.23.7.a */; };
+		679AE1501B7C6F17008F401C /* libLightspeed-armv7-2.23.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE1481B7C6F17008F401C /* libLightspeed-armv7-2.23.7.a */; };
+		679AE1511B7C6F17008F401C /* libLightspeed-armv7s-2.23.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE1491B7C6F17008F401C /* libLightspeed-armv7s-2.23.7.a */; };
+		679AE1521B7C6F17008F401C /* libLightspeed-i386-2.23.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE14A1B7C6F17008F401C /* libLightspeed-i386-2.23.7.a */; };
+		679AE1531B7C6F17008F401C /* libLightspeed-x86_64-2.23.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 679AE14B1B7C6F17008F401C /* libLightspeed-x86_64-2.23.7.a */; };
+		67F156561B4E5D19007928D7 /* HXRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F156551B4E5D19007928D7 /* HXRoomViewController.m */; };
+		67F1565A1B4E6D0E007928D7 /* HXRoomCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F156591B4E6D0E007928D7 /* HXRoomCollectionViewCell.m */; };
+		67F1565D1B5364DF007928D7 /* HXCreateRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F1565C1B5364DF007928D7 /* HXCreateRoomViewController.m */; };
+		67F156601B55FEE6007928D7 /* HXAnRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F1565F1B55FEE6007928D7 /* HXAnRoom.m */; };
+		67F156641B55FF59007928D7 /* HXAnRoom+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F156631B55FF59007928D7 /* HXAnRoom+Additions.m */; };
+		67F156671B560897007928D7 /* AnRoomUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F156661B560897007928D7 /* AnRoomUtil.m */; };
+		67F1566B1B57B670007928D7 /* HXAnRoomWallViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F1566A1B57B670007928D7 /* HXAnRoomWallViewController.m */; };
+		8CC2FAF11AEDE9CE00A68C28 /* HXCustomerServiceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CC2FAF01AEDE9CE00A68C28 /* HXCustomerServiceViewController.m */; };
+		8CCE8BB61AF079BC005E0B6D /* HXAnDeskViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CCE8BB51AF079BC005E0B6D /* HXAnDeskViewController.m */; };
+		8CCE8BBC1AF0B229005E0B6D /* ApiCaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CCE8BBB1AF0B229005E0B6D /* ApiCaller.m */; };
+		A930A37C1B6FB623006812DE /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A930A37B1B6FB623006812DE /* CoreLocation.framework */; };
+		A930A37E1B6FB62F006812DE /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A930A37D1B6FB62F006812DE /* CoreTelephony.framework */; };
+		A930A3801B6FB639006812DE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A930A37F1B6FB639006812DE /* SystemConfiguration.framework */; };
+		A930A3851B6FB7DF006812DE /* TestinAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A930A3841B6FB7DF006812DE /* TestinAgent.framework */; };
 		FE0758311AD563A100D14F46 /* HXCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0758301AD563A100D14F46 /* HXCommentViewController.m */; };
 		FE0758341AD5661700D14F46 /* HXCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0758331AD5661700D14F46 /* HXCommentView.m */; };
 		FE0758371AD56C2F00D14F46 /* HXCommentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0758361AD56C2F00D14F46 /* HXCommentTableViewCell.m */; };
@@ -207,25 +227,6 @@
 		13A7E5671ADCB8C700AC0C29 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		13A7E5681ADE259900AC0C29 /* HXChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXChat.h; sourceTree = "<group>"; };
 		13A7E5691ADE259900AC0C29 /* HXChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXChat.m; sourceTree = "<group>"; };
-		13A7E56D1ADE99A300AC0C29 /* libanLive-arm64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libanLive-arm64.a"; sourceTree = "<group>"; };
-		13A7E56E1ADE99A300AC0C29 /* libanLive-armv7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libanLive-armv7.a"; sourceTree = "<group>"; };
-		13A7E56F1ADE99A300AC0C29 /* libanLive-i386.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libanLive-i386.a"; sourceTree = "<group>"; };
-		13A7E5721ADE99A300AC0C29 /* AnDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnDeviceManager.h; sourceTree = "<group>"; };
-		13A7E5731ADE99A300AC0C29 /* AnIM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnIM.h; sourceTree = "<group>"; };
-		13A7E5741ADE99A300AC0C29 /* AnIMMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnIMMessage.h; sourceTree = "<group>"; };
-		13A7E5751ADE99A300AC0C29 /* AnLive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLive.h; sourceTree = "<group>"; };
-		13A7E5761ADE99A300AC0C29 /* AnLiveLocalVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLiveLocalVideoView.h; sourceTree = "<group>"; };
-		13A7E5771ADE99A300AC0C29 /* AnLiveProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLiveProtocols.h; sourceTree = "<group>"; };
-		13A7E5781ADE99A300AC0C29 /* AnLiveVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLiveVideoView.h; sourceTree = "<group>"; };
-		13A7E5791ADE99A300AC0C29 /* AnPush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnPush.h; sourceTree = "<group>"; };
-		13A7E57A1ADE99A300AC0C29 /* AnSocial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnSocial.h; sourceTree = "<group>"; };
-		13A7E57B1ADE99A300AC0C29 /* AnSocialFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnSocialFile.h; sourceTree = "<group>"; };
-		13A7E57C1ADE99A300AC0C29 /* ArrownockException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrownockException.h; sourceTree = "<group>"; };
-		13A7E57D1ADE99A300AC0C29 /* libLightspeed-arm64-2.22.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-arm64-2.22.a"; sourceTree = "<group>"; };
-		13A7E57E1ADE99A300AC0C29 /* libLightspeed-armv7-2.22.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-armv7-2.22.a"; sourceTree = "<group>"; };
-		13A7E57F1ADE99A300AC0C29 /* libLightspeed-armv7s-2.22.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-armv7s-2.22.a"; sourceTree = "<group>"; };
-		13A7E5801ADE99A300AC0C29 /* libLightspeed-i386-2.22.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-i386-2.22.a"; sourceTree = "<group>"; };
-		13A7E5811ADE99A300AC0C29 /* libLightspeed-x86_64-2.22.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-x86_64-2.22.a"; sourceTree = "<group>"; };
 		13D4BCE31AD3A5A60059FF4A /* HXComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXComment.h; sourceTree = "<group>"; };
 		13D4BCE41AD3A5A60059FF4A /* HXComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXComment.m; sourceTree = "<group>"; };
 		13D4BCE61AD3A5C50059FF4A /* HXLike.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXLike.h; sourceTree = "<group>"; };
@@ -254,6 +255,60 @@
 		13D4BD1F1AD6715A0059FF4A /* HXChatHistoryTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXChatHistoryTableViewCell.m; sourceTree = "<group>"; };
 		13D4BD221AD7BB400059FF4A /* HXFriendProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXFriendProfileViewController.h; sourceTree = "<group>"; };
 		13D4BD231AD7BB400059FF4A /* HXFriendProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXFriendProfileViewController.m; sourceTree = "<group>"; };
+		6761F9D51B6B790900923FB8 /* UIColor+KVNContrast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+KVNContrast.h"; sourceTree = "<group>"; };
+		6761F9D61B6B790900923FB8 /* UIColor+KVNContrast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+KVNContrast.m"; sourceTree = "<group>"; };
+		6761F9D71B6B790900923FB8 /* UIImage+KVNEmpty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+KVNEmpty.h"; sourceTree = "<group>"; };
+		6761F9D81B6B790900923FB8 /* UIImage+KVNEmpty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+KVNEmpty.m"; sourceTree = "<group>"; };
+		6761F9D91B6B790900923FB8 /* UIImage+KVNImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+KVNImageEffects.h"; sourceTree = "<group>"; };
+		6761F9DA1B6B790900923FB8 /* UIImage+KVNImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+KVNImageEffects.m"; sourceTree = "<group>"; };
+		6761F9DC1B6B790900923FB8 /* KVNProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVNProgress.h; sourceTree = "<group>"; };
+		6761F9DD1B6B790900923FB8 /* KVNProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVNProgress.m; sourceTree = "<group>"; };
+		6761F9DE1B6B790900923FB8 /* KVNProgressConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVNProgressConfiguration.h; sourceTree = "<group>"; };
+		6761F9DF1B6B790900923FB8 /* KVNProgressConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVNProgressConfiguration.m; sourceTree = "<group>"; };
+		6761F9E11B6B790900923FB8 /* KVNProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = KVNProgressView.xib; sourceTree = "<group>"; };
+		679AE1371B7C6F17008F401C /* libanLive-arm64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libanLive-arm64.a"; sourceTree = "<group>"; };
+		679AE1381B7C6F17008F401C /* libanLive-armv7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libanLive-armv7.a"; sourceTree = "<group>"; };
+		679AE1391B7C6F17008F401C /* libanLive-i386.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libanLive-i386.a"; sourceTree = "<group>"; };
+		679AE13C1B7C6F17008F401C /* AnDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnDeviceManager.h; sourceTree = "<group>"; };
+		679AE13D1B7C6F17008F401C /* AnIM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnIM.h; sourceTree = "<group>"; };
+		679AE13E1B7C6F17008F401C /* AnIMMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnIMMessage.h; sourceTree = "<group>"; };
+		679AE13F1B7C6F17008F401C /* AnLive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLive.h; sourceTree = "<group>"; };
+		679AE1401B7C6F17008F401C /* AnLiveLocalVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLiveLocalVideoView.h; sourceTree = "<group>"; };
+		679AE1411B7C6F17008F401C /* AnLiveProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLiveProtocols.h; sourceTree = "<group>"; };
+		679AE1421B7C6F17008F401C /* AnLiveVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnLiveVideoView.h; sourceTree = "<group>"; };
+		679AE1431B7C6F17008F401C /* AnPush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnPush.h; sourceTree = "<group>"; };
+		679AE1441B7C6F17008F401C /* AnSocial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnSocial.h; sourceTree = "<group>"; };
+		679AE1451B7C6F17008F401C /* AnSocialFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnSocialFile.h; sourceTree = "<group>"; };
+		679AE1461B7C6F17008F401C /* ArrownockException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrownockException.h; sourceTree = "<group>"; };
+		679AE1471B7C6F17008F401C /* libLightspeed-arm64-2.23.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-arm64-2.23.7.a"; sourceTree = "<group>"; };
+		679AE1481B7C6F17008F401C /* libLightspeed-armv7-2.23.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-armv7-2.23.7.a"; sourceTree = "<group>"; };
+		679AE1491B7C6F17008F401C /* libLightspeed-armv7s-2.23.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-armv7s-2.23.7.a"; sourceTree = "<group>"; };
+		679AE14A1B7C6F17008F401C /* libLightspeed-i386-2.23.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-i386-2.23.7.a"; sourceTree = "<group>"; };
+		679AE14B1B7C6F17008F401C /* libLightspeed-x86_64-2.23.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libLightspeed-x86_64-2.23.7.a"; sourceTree = "<group>"; };
+		67F156541B4E5D19007928D7 /* HXRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HXRoomViewController.h; path = Group/HXRoomViewController.h; sourceTree = "<group>"; };
+		67F156551B4E5D19007928D7 /* HXRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HXRoomViewController.m; path = Group/HXRoomViewController.m; sourceTree = "<group>"; };
+		67F156581B4E6D0E007928D7 /* HXRoomCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXRoomCollectionViewCell.h; sourceTree = "<group>"; };
+		67F156591B4E6D0E007928D7 /* HXRoomCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXRoomCollectionViewCell.m; sourceTree = "<group>"; };
+		67F1565B1B5364DF007928D7 /* HXCreateRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCreateRoomViewController.h; sourceTree = "<group>"; };
+		67F1565C1B5364DF007928D7 /* HXCreateRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCreateRoomViewController.m; sourceTree = "<group>"; };
+		67F1565E1B55FEE6007928D7 /* HXAnRoom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HXAnRoom.h; path = HXAnRoom/HXAnRoom.h; sourceTree = "<group>"; };
+		67F1565F1B55FEE6007928D7 /* HXAnRoom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HXAnRoom.m; path = HXAnRoom/HXAnRoom.m; sourceTree = "<group>"; };
+		67F156621B55FF59007928D7 /* HXAnRoom+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "HXAnRoom+Additions.h"; path = "HXAnRoom/HXAnRoom+Additions.h"; sourceTree = "<group>"; };
+		67F156631B55FF59007928D7 /* HXAnRoom+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "HXAnRoom+Additions.m"; path = "HXAnRoom/HXAnRoom+Additions.m"; sourceTree = "<group>"; };
+		67F156651B560897007928D7 /* AnRoomUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnRoomUtil.h; path = AnRoomUtil/AnRoomUtil.h; sourceTree = "<group>"; };
+		67F156661B560897007928D7 /* AnRoomUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AnRoomUtil.m; path = AnRoomUtil/AnRoomUtil.m; sourceTree = "<group>"; };
+		67F156691B57B670007928D7 /* HXAnRoomWallViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HXAnRoomWallViewController.h; path = Group/HXAnRoomWallViewController.h; sourceTree = "<group>"; };
+		67F1566A1B57B670007928D7 /* HXAnRoomWallViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HXAnRoomWallViewController.m; path = Group/HXAnRoomWallViewController.m; sourceTree = "<group>"; };
+		8CC2FAEF1AEDE9CE00A68C28 /* HXCustomerServiceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HXCustomerServiceViewController.h; path = CustomerService/HXCustomerServiceViewController.h; sourceTree = "<group>"; };
+		8CC2FAF01AEDE9CE00A68C28 /* HXCustomerServiceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HXCustomerServiceViewController.m; path = CustomerService/HXCustomerServiceViewController.m; sourceTree = "<group>"; };
+		8CCE8BB41AF079BC005E0B6D /* HXAnDeskViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HXAnDeskViewController.h; path = CustomerService/HXAnDeskViewController.h; sourceTree = "<group>"; };
+		8CCE8BB51AF079BC005E0B6D /* HXAnDeskViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HXAnDeskViewController.m; path = CustomerService/HXAnDeskViewController.m; sourceTree = "<group>"; };
+		8CCE8BBA1AF0B229005E0B6D /* ApiCaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ApiCaller.h; path = CustomerService/ApiCaller.h; sourceTree = "<group>"; };
+		8CCE8BBB1AF0B229005E0B6D /* ApiCaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ApiCaller.m; path = CustomerService/ApiCaller.m; sourceTree = "<group>"; };
+		A930A37B1B6FB623006812DE /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		A930A37D1B6FB62F006812DE /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		A930A37F1B6FB639006812DE /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		A930A3841B6FB7DF006812DE /* TestinAgent.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TestinAgent.framework; sourceTree = "<group>"; };
 		FE07582F1AD563A100D14F46 /* HXCommentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCommentViewController.h; sourceTree = "<group>"; };
 		FE0758301AD563A100D14F46 /* HXCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCommentViewController.m; sourceTree = "<group>"; };
 		FE0758321AD5661700D14F46 /* HXCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCommentView.h; sourceTree = "<group>"; };
@@ -331,30 +386,34 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				679AE14D1B7C6F17008F401C /* libanLive-armv7.a in Frameworks */,
+				679AE14E1B7C6F17008F401C /* libanLive-i386.a in Frameworks */,
+				679AE14C1B7C6F17008F401C /* libanLive-arm64.a in Frameworks */,
+				679AE1511B7C6F17008F401C /* libLightspeed-armv7s-2.23.7.a in Frameworks */,
+				679AE1531B7C6F17008F401C /* libLightspeed-x86_64-2.23.7.a in Frameworks */,
+				679AE1521B7C6F17008F401C /* libLightspeed-i386-2.23.7.a in Frameworks */,
+				679AE1501B7C6F17008F401C /* libLightspeed-armv7-2.23.7.a in Frameworks */,
+				679AE14F1B7C6F17008F401C /* libLightspeed-arm64-2.23.7.a in Frameworks */,
 				FEDF01AC1ABAE3B700AD1036 /* libsqlite3.dylib in Frameworks */,
 				FEDF01AA1ABAE3A900AD1036 /* libicucore.dylib in Frameworks */,
 				FEDF01A81ABAE39400AD1036 /* libc++.dylib in Frameworks */,
 				FEDF01A61ABAE37F00AD1036 /* libstdc++.6.dylib in Frameworks */,
-				13A7E5861ADE99A300AC0C29 /* libLightspeed-armv7-2.22.a in Frameworks */,
-				13A7E5841ADE99A300AC0C29 /* libanLive-i386.a in Frameworks */,
-				13A7E5881ADE99A300AC0C29 /* libLightspeed-i386-2.22.a in Frameworks */,
+				A930A3851B6FB7DF006812DE /* TestinAgent.framework in Frameworks */,
+				A930A3801B6FB639006812DE /* SystemConfiguration.framework in Frameworks */,
+				A930A37E1B6FB62F006812DE /* CoreTelephony.framework in Frameworks */,
+				A930A37C1B6FB623006812DE /* CoreLocation.framework in Frameworks */,
 				133A568A1ACD620000D5A43A /* SDWebImage.framework in Frameworks */,
 				FEDF003A1ABA9B3600AD1036 /* ImageIO.framework in Frameworks */,
-				13A7E5851ADE99A300AC0C29 /* libLightspeed-arm64-2.22.a in Frameworks */,
 				FEF416E11AB7EC9200C7FFC7 /* Foundation.framework in Frameworks */,
-				13A7E5871ADE99A300AC0C29 /* libLightspeed-armv7s-2.22.a in Frameworks */,
 				FEF416E31AB7EC9C00C7FFC7 /* UIKit.framework in Frameworks */,
 				FEF416E61AB7ECBF00C7FFC7 /* QuartzCore.framework in Frameworks */,
 				FEF416E81AB7ECF800C7FFC7 /* CoreGraphics.framework in Frameworks */,
 				FEF416EA1AB7ED0700C7FFC7 /* CoreVideo.framework in Frameworks */,
 				FEF416EC1AB7ED1500C7FFC7 /* CoreMedia.framework in Frameworks */,
 				FEF416EE1AB7ED2300C7FFC7 /* CoreAudio.framework in Frameworks */,
-				13A7E5821ADE99A300AC0C29 /* libanLive-arm64.a in Frameworks */,
 				FEF416F01AB7ED3200C7FFC7 /* AVFoundation.framework in Frameworks */,
 				FEF416F21AB7ED3E00C7FFC7 /* AudioToolbox.framework in Frameworks */,
-				13A7E5831ADE99A300AC0C29 /* libanLive-armv7.a in Frameworks */,
 				FEF416F41AB7ED4A00C7FFC7 /* GLKit.framework in Frameworks */,
-				13A7E5891ADE99A300AC0C29 /* libLightspeed-x86_64-2.22.a in Frameworks */,
 				FEF416F61AB7ED5500C7FFC7 /* CFNetwork.framework in Frameworks */,
 				FEF416F81AB7ED6400C7FFC7 /* OpenGLES.framework in Frameworks */,
 				FEF416DF1AB7EC8800C7FFC7 /* Security.framework in Frameworks */,
@@ -374,6 +433,8 @@
 		133A56661ACD620000D5A43A /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				A930A3831B6FB7DF006812DE /* Testin */,
+				6761F9D31B6B790900923FB8 /* KVNProgress */,
 				133A56671ACD620000D5A43A /* HPGrowingTexView */,
 				133A566C1ACD620000D5A43A /* PHFComposeBarView */,
 				133A56761ACD620000D5A43A /* PHFDelegateChain */,
@@ -601,6 +662,8 @@
 				13D4BD001AD4C02D0059FF4A /* Wall */,
 				135FD1EC1AC939CF00FB3BDD /* HXDiscoverViewController.h */,
 				135FD1ED1AC939CF00FB3BDD /* HXDiscoverViewController.m */,
+				67F156571B4E5D1F007928D7 /* Room */,
+				8CC2FAF21AEDE9D200A68C28 /* CustomerService */,
 			);
 			path = Discover;
 			sourceTree = "<group>";
@@ -648,56 +711,6 @@
 				135FD2071ACB85C400FB3BDD /* HXNumberBadge.m */,
 			);
 			path = NumberBadge;
-			sourceTree = "<group>";
-		};
-		13A7E56B1ADE99A300AC0C29 /* LightspeedSDK */ = {
-			isa = PBXGroup;
-			children = (
-				13A7E56C1ADE99A300AC0C29 /* anLive */,
-				13A7E5701ADE99A300AC0C29 /* include */,
-				13A7E57D1ADE99A300AC0C29 /* libLightspeed-arm64-2.22.a */,
-				13A7E57E1ADE99A300AC0C29 /* libLightspeed-armv7-2.22.a */,
-				13A7E57F1ADE99A300AC0C29 /* libLightspeed-armv7s-2.22.a */,
-				13A7E5801ADE99A300AC0C29 /* libLightspeed-i386-2.22.a */,
-				13A7E5811ADE99A300AC0C29 /* libLightspeed-x86_64-2.22.a */,
-			);
-			path = LightspeedSDK;
-			sourceTree = "<group>";
-		};
-		13A7E56C1ADE99A300AC0C29 /* anLive */ = {
-			isa = PBXGroup;
-			children = (
-				13A7E56D1ADE99A300AC0C29 /* libanLive-arm64.a */,
-				13A7E56E1ADE99A300AC0C29 /* libanLive-armv7.a */,
-				13A7E56F1ADE99A300AC0C29 /* libanLive-i386.a */,
-			);
-			path = anLive;
-			sourceTree = "<group>";
-		};
-		13A7E5701ADE99A300AC0C29 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				13A7E5711ADE99A300AC0C29 /* Arrownock */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
-		13A7E5711ADE99A300AC0C29 /* Arrownock */ = {
-			isa = PBXGroup;
-			children = (
-				13A7E5721ADE99A300AC0C29 /* AnDeviceManager.h */,
-				13A7E5731ADE99A300AC0C29 /* AnIM.h */,
-				13A7E5741ADE99A300AC0C29 /* AnIMMessage.h */,
-				13A7E5751ADE99A300AC0C29 /* AnLive.h */,
-				13A7E5761ADE99A300AC0C29 /* AnLiveLocalVideoView.h */,
-				13A7E5771ADE99A300AC0C29 /* AnLiveProtocols.h */,
-				13A7E5781ADE99A300AC0C29 /* AnLiveVideoView.h */,
-				13A7E5791ADE99A300AC0C29 /* AnPush.h */,
-				13A7E57A1ADE99A300AC0C29 /* AnSocial.h */,
-				13A7E57B1ADE99A300AC0C29 /* AnSocialFile.h */,
-				13A7E57C1ADE99A300AC0C29 /* ArrownockException.h */,
-			);
-			path = Arrownock;
 			sourceTree = "<group>";
 		};
 		13D4BCE01AD3A58F0059FF4A /* HXComment */ = {
@@ -802,6 +815,154 @@
 			path = FriendProfile;
 			sourceTree = "<group>";
 		};
+		6761F9D31B6B790900923FB8 /* KVNProgress */ = {
+			isa = PBXGroup;
+			children = (
+				6761F9D41B6B790900923FB8 /* Categories */,
+				6761F9DB1B6B790900923FB8 /* Classes */,
+				6761F9E01B6B790900923FB8 /* Resources */,
+			);
+			path = KVNProgress;
+			sourceTree = "<group>";
+		};
+		6761F9D41B6B790900923FB8 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				6761F9D51B6B790900923FB8 /* UIColor+KVNContrast.h */,
+				6761F9D61B6B790900923FB8 /* UIColor+KVNContrast.m */,
+				6761F9D71B6B790900923FB8 /* UIImage+KVNEmpty.h */,
+				6761F9D81B6B790900923FB8 /* UIImage+KVNEmpty.m */,
+				6761F9D91B6B790900923FB8 /* UIImage+KVNImageEffects.h */,
+				6761F9DA1B6B790900923FB8 /* UIImage+KVNImageEffects.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		6761F9DB1B6B790900923FB8 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				6761F9DC1B6B790900923FB8 /* KVNProgress.h */,
+				6761F9DD1B6B790900923FB8 /* KVNProgress.m */,
+				6761F9DE1B6B790900923FB8 /* KVNProgressConfiguration.h */,
+				6761F9DF1B6B790900923FB8 /* KVNProgressConfiguration.m */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		6761F9E01B6B790900923FB8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6761F9E11B6B790900923FB8 /* KVNProgressView.xib */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		679AE1351B7C6F17008F401C /* LightspeedSDK */ = {
+			isa = PBXGroup;
+			children = (
+				679AE1361B7C6F17008F401C /* anLive */,
+				679AE13A1B7C6F17008F401C /* include */,
+				679AE1471B7C6F17008F401C /* libLightspeed-arm64-2.23.7.a */,
+				679AE1481B7C6F17008F401C /* libLightspeed-armv7-2.23.7.a */,
+				679AE1491B7C6F17008F401C /* libLightspeed-armv7s-2.23.7.a */,
+				679AE14A1B7C6F17008F401C /* libLightspeed-i386-2.23.7.a */,
+				679AE14B1B7C6F17008F401C /* libLightspeed-x86_64-2.23.7.a */,
+			);
+			path = LightspeedSDK;
+			sourceTree = "<group>";
+		};
+		679AE1361B7C6F17008F401C /* anLive */ = {
+			isa = PBXGroup;
+			children = (
+				679AE1371B7C6F17008F401C /* libanLive-arm64.a */,
+				679AE1381B7C6F17008F401C /* libanLive-armv7.a */,
+				679AE1391B7C6F17008F401C /* libanLive-i386.a */,
+			);
+			path = anLive;
+			sourceTree = "<group>";
+		};
+		679AE13A1B7C6F17008F401C /* include */ = {
+			isa = PBXGroup;
+			children = (
+				679AE13B1B7C6F17008F401C /* Arrownock */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		679AE13B1B7C6F17008F401C /* Arrownock */ = {
+			isa = PBXGroup;
+			children = (
+				679AE13C1B7C6F17008F401C /* AnDeviceManager.h */,
+				679AE13D1B7C6F17008F401C /* AnIM.h */,
+				679AE13E1B7C6F17008F401C /* AnIMMessage.h */,
+				679AE13F1B7C6F17008F401C /* AnLive.h */,
+				679AE1401B7C6F17008F401C /* AnLiveLocalVideoView.h */,
+				679AE1411B7C6F17008F401C /* AnLiveProtocols.h */,
+				679AE1421B7C6F17008F401C /* AnLiveVideoView.h */,
+				679AE1431B7C6F17008F401C /* AnPush.h */,
+				679AE1441B7C6F17008F401C /* AnSocial.h */,
+				679AE1451B7C6F17008F401C /* AnSocialFile.h */,
+				679AE1461B7C6F17008F401C /* ArrownockException.h */,
+			);
+			path = Arrownock;
+			sourceTree = "<group>";
+		};
+		67F156571B4E5D1F007928D7 /* Room */ = {
+			isa = PBXGroup;
+			children = (
+				67F156541B4E5D19007928D7 /* HXRoomViewController.h */,
+				67F156551B4E5D19007928D7 /* HXRoomViewController.m */,
+				67F156581B4E6D0E007928D7 /* HXRoomCollectionViewCell.h */,
+				67F156591B4E6D0E007928D7 /* HXRoomCollectionViewCell.m */,
+				67F1565B1B5364DF007928D7 /* HXCreateRoomViewController.h */,
+				67F1565C1B5364DF007928D7 /* HXCreateRoomViewController.m */,
+				67F156691B57B670007928D7 /* HXAnRoomWallViewController.h */,
+				67F1566A1B57B670007928D7 /* HXAnRoomWallViewController.m */,
+			);
+			name = Room;
+			sourceTree = "<group>";
+		};
+		67F156611B55FEEB007928D7 /* HXAnRoom */ = {
+			isa = PBXGroup;
+			children = (
+				67F156621B55FF59007928D7 /* HXAnRoom+Additions.h */,
+				67F156631B55FF59007928D7 /* HXAnRoom+Additions.m */,
+				67F1565E1B55FEE6007928D7 /* HXAnRoom.h */,
+				67F1565F1B55FEE6007928D7 /* HXAnRoom.m */,
+			);
+			name = HXAnRoom;
+			sourceTree = "<group>";
+		};
+		67F156681B56089B007928D7 /* AnRoomUtil */ = {
+			isa = PBXGroup;
+			children = (
+				67F156651B560897007928D7 /* AnRoomUtil.h */,
+				67F156661B560897007928D7 /* AnRoomUtil.m */,
+			);
+			name = AnRoomUtil;
+			sourceTree = "<group>";
+		};
+		8CC2FAF21AEDE9D200A68C28 /* CustomerService */ = {
+			isa = PBXGroup;
+			children = (
+				8CCE8BBA1AF0B229005E0B6D /* ApiCaller.h */,
+				8CCE8BBB1AF0B229005E0B6D /* ApiCaller.m */,
+				8CCE8BB41AF079BC005E0B6D /* HXAnDeskViewController.h */,
+				8CCE8BB51AF079BC005E0B6D /* HXAnDeskViewController.m */,
+				8CC2FAEF1AEDE9CE00A68C28 /* HXCustomerServiceViewController.h */,
+				8CC2FAF01AEDE9CE00A68C28 /* HXCustomerServiceViewController.m */,
+			);
+			name = CustomerService;
+			sourceTree = "<group>";
+		};
+		A930A3831B6FB7DF006812DE /* Testin */ = {
+			isa = PBXGroup;
+			children = (
+				A930A3841B6FB7DF006812DE /* TestinAgent.framework */,
+			);
+			path = Testin;
+			sourceTree = "<group>";
+		};
 		FE0758221AD5627300D14F46 /* Comment */ = {
 			isa = PBXGroup;
 			children = (
@@ -873,6 +1034,7 @@
 				FE6CF4831AB82A3900D27905 /* HXChat */,
 				FE6CF4881AB82A3900D27905 /* HXMessage */,
 				FE6CF4771AB81D5C00D27905 /* HXUser */,
+				67F156611B55FEEB007928D7 /* HXAnRoom */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -899,6 +1061,7 @@
 				FE6CF4961AB82B4600D27905 /* MessageUtil */,
 				FE6CF4991AB82B4600D27905 /* UserUtil */,
 				FE6CF47F1AB8243100D27905 /* CoreDataUtil */,
+				67F156681B56089B007928D7 /* AnRoomUtil */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -982,7 +1145,7 @@
 		FEF416431AB7D6AA00C7FFC7 = {
 			isa = PBXGroup;
 			children = (
-				13A7E56B1ADE99A300AC0C29 /* LightspeedSDK */,
+				679AE1351B7C6F17008F401C /* LightspeedSDK */,
 				133A56661ACD620000D5A43A /* ThirdParty */,
 				FEF4164E1AB7D6AA00C7FFC7 /* Impp */,
 				FEF416681AB7D6AB00C7FFC7 /* ImppTests */,
@@ -1111,6 +1274,9 @@
 				FEDF01A91ABAE3A900AD1036 /* libicucore.dylib */,
 				FEDF01A71ABAE39400AD1036 /* libc++.dylib */,
 				FEDF01A51ABAE37F00AD1036 /* libstdc++.6.dylib */,
+				A930A37F1B6FB639006812DE /* SystemConfiguration.framework */,
+				A930A37D1B6FB62F006812DE /* CoreTelephony.framework */,
+				A930A37B1B6FB623006812DE /* CoreLocation.framework */,
 				FEDF00381ABA9A9F00AD1036 /* ImageIO.framework */,
 				FEF416F71AB7ED6400C7FFC7 /* OpenGLES.framework */,
 				FEF416F51AB7ED5500C7FFC7 /* CFNetwork.framework */,
@@ -1222,6 +1388,7 @@
 				FEF416601AB7D6AA00C7FFC7 /* LaunchScreen.xib in Resources */,
 				133A56851ACD620000D5A43A /* LICENSE in Resources */,
 				FEF4165D1AB7D6AA00C7FFC7 /* Images.xcassets in Resources */,
+				6761F9E71B6B790900923FB8 /* KVNProgressView.xib in Resources */,
 				133A56871ACD620000D5A43A /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1244,19 +1411,25 @@
 				FE6CF4AD1AB8353E00D27905 /* Impp.xcdatamodeld in Sources */,
 				FE6CF4A31AB82C1100D27905 /* NotificationCenterUtil.m in Sources */,
 				FE6CF49C1AB82B4600D27905 /* ChatUtil.m in Sources */,
+				6761F9E51B6B790900923FB8 /* KVNProgress.m in Sources */,
 				FE4BBBDC1ADA98BD0087F545 /* HXImageDetailViewController.m in Sources */,
+				67F156641B55FF59007928D7 /* HXAnRoom+Additions.m in Sources */,
 				135FD20B1ACBCAE100FB3BDD /* HXFriendSelectionViewController.m in Sources */,
 				FE6CF4901AB82A3900D27905 /* HXMessage.m in Sources */,
 				FE0758371AD56C2F00D14F46 /* HXCommentTableViewCell.m in Sources */,
 				FE6CF48F1AB82A3900D27905 /* HXMessage+Additions.m in Sources */,
+				8CCE8BBC1AF0B229005E0B6D /* ApiCaller.m in Sources */,
 				FE6CF47C1AB81D5C00D27905 /* HXUser+Additions.m in Sources */,
 				13D4BCF41AD3B0F30059FF4A /* HXPost+Additions.m in Sources */,
 				134E05551AC29B7F00ADFA33 /* HXMapViewController.m in Sources */,
 				134E053E1AC2976E00ADFA33 /* HXFriendRequestTableViewCell.m in Sources */,
+				6761F9E31B6B790900923FB8 /* UIImage+KVNEmpty.m in Sources */,
 				FE6CF4701AB80E2100D27905 /* HXLoadingView.m in Sources */,
+				8CC2FAF11AEDE9CE00A68C28 /* HXCustomerServiceViewController.m in Sources */,
 				FE6CF49F1AB82B4600D27905 /* UserUtil.m in Sources */,
 				135FD2351ACBFF0900FB3BDD /* HXMessageTableViewCell.m in Sources */,
 				133A568B1ACD620100D5A43A /* SZTextView.m in Sources */,
+				6761F9E21B6B790900923FB8 /* UIColor+KVNContrast.m in Sources */,
 				135FD1F51ACA773600FB3BDD /* UIView+Toast.m in Sources */,
 				134E05521AC29B7F00ADFA33 /* HXChatViewController.m in Sources */,
 				133A56861ACD620000D5A43A /* README.md in Sources */,
@@ -1272,10 +1445,12 @@
 				FE6CF48D1AB82A3900D27905 /* HXChat+Additions.m in Sources */,
 				134E053D1AC2976E00ADFA33 /* HXFriendViewController.m in Sources */,
 				13D4BD031AD4C0580059FF4A /* HXWallViewController.m in Sources */,
+				67F156671B560897007928D7 /* AnRoomUtil.m in Sources */,
 				FE6CF49E1AB82B4600D27905 /* MessageUtil.m in Sources */,
 				FEF416851AB7E3D800C7FFC7 /* HXSettingsViewController.m in Sources */,
 				133A56841ACD620000D5A43A /* PHFComposeBarView_TextView.m in Sources */,
 				134E05791AC4221C00ADFA33 /* HXUser.m in Sources */,
+				67F1565D1B5364DF007928D7 /* HXCreateRoomViewController.m in Sources */,
 				FE6CF4821AB8243100D27905 /* CoreDataUtil.m in Sources */,
 				135FD2041ACABB9500FB3BDD /* HXCustomTableViewCell.m in Sources */,
 				13D4BCEB1AD3A5DD0059FF4A /* HXPost.m in Sources */,
@@ -1283,11 +1458,17 @@
 				FEF416551AB7D6AA00C7FFC7 /* AppDelegate.m in Sources */,
 				13A7E56A1ADE259900AC0C29 /* HXChat.m in Sources */,
 				13D4BD241AD7BB400059FF4A /* HXFriendProfileViewController.m in Sources */,
+				67F1566B1B57B670007928D7 /* HXAnRoomWallViewController.m in Sources */,
 				13D4BD201AD6715A0059FF4A /* HXChatHistoryTableViewCell.m in Sources */,
 				FEF416821AB7E3C000C7FFC7 /* HXLoginSignupViewController.m in Sources */,
 				13D4BCE81AD3A5C50059FF4A /* HXLike.m in Sources */,
 				FE07583E1AD59D9400D14F46 /* HXCreatePostViewController.m in Sources */,
+				67F156601B55FEE6007928D7 /* HXAnRoom.m in Sources */,
+				67F1565A1B4E6D0E007928D7 /* HXRoomCollectionViewCell.m in Sources */,
 				133A56821ACD620000D5A43A /* PHFComposeBarView.m in Sources */,
+				67F156561B4E5D19007928D7 /* HXRoomViewController.m in Sources */,
+				6761F9E41B6B790900923FB8 /* UIImage+KVNImageEffects.m in Sources */,
+				6761F9E61B6B790900923FB8 /* KVNProgressConfiguration.m in Sources */,
 				FE6CF4A71AB8308F00D27905 /* HXTabBarViewController.m in Sources */,
 				135FD1E91AC9059400FB3BDD /* UIFont+customFont.m in Sources */,
 				134E05681AC29CA000ADFA33 /* HXIMManager.m in Sources */,
@@ -1299,6 +1480,7 @@
 				134E056B1AC29CA000ADFA33 /* HXAnSocialManager.m in Sources */,
 				135FD1EA1AC9059400FB3BDD /* UILabel+customLabel.m in Sources */,
 				FE0758341AD5661700D14F46 /* HXCommentView.m in Sources */,
+				8CCE8BB61AF079BC005E0B6D /* HXAnDeskViewController.m in Sources */,
 				FE0758411AD7532E00D14F46 /* HXLikeCommentButton.m in Sources */,
 				135FD1F91ACA9EF400FB3BDD /* HXFriendSearchViewController.m in Sources */,
 				135FD2331ACBFF0900FB3BDD /* HXComposeView.m in Sources */,
@@ -1452,26 +1634,31 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ThirdParty/SDWebImage",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/Testin",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/ThirdParty/**",
 					"$(PROJECT_DIR)/LightspeedSDK/anLive/**",
 					"$(PROJECT_DIR)/LightspeedSDK/**",
 				);
 				INFOPLIST_FILE = Impp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_DEPENDENCY_INFO_FILE = "$(OBJECT_FILE_DIR_$(CURRENT_VARIANT))/$(CURRENT_ARCH)/Impp_dependency_info.dat";
 				LD_MAP_FILE_PATH = "$(TARGET_TEMP_DIR)/Impp-LinkMap-$(CURRENT_VARIANT)-$(CURRENT_ARCH).txt";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/ThirdParty/**",
 					"$(PROJECT_DIR)/LightspeedSDK/anLive/**",
 					"$(PROJECT_DIR)/LightspeedSDK/**",
 				);
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
+					"$(inherited)",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = Impp.app/PrivateHeaders;
 				PRODUCT_MODULE_NAME = Impp;
@@ -1490,26 +1677,31 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ThirdParty/SDWebImage",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/Testin",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/ThirdParty/**",
 					"$(PROJECT_DIR)/LightspeedSDK/anLive/**",
 					"$(PROJECT_DIR)/LightspeedSDK/**",
 				);
 				INFOPLIST_FILE = Impp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_DEPENDENCY_INFO_FILE = "$(OBJECT_FILE_DIR_$(CURRENT_VARIANT))/$(CURRENT_ARCH)/Impp_dependency_info.dat";
 				LD_MAP_FILE_PATH = "$(TARGET_TEMP_DIR)/Impp-LinkMap-$(CURRENT_VARIANT)-$(CURRENT_ARCH).txt";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/ThirdParty/**",
 					"$(PROJECT_DIR)/LightspeedSDK/anLive/**",
 					"$(PROJECT_DIR)/LightspeedSDK/**",
 				);
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
+					"$(inherited)",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = Impp.app/PrivateHeaders;
 				PRODUCT_MODULE_NAME = Impp;

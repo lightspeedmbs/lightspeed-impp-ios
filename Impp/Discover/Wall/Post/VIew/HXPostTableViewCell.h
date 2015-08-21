@@ -25,6 +25,8 @@ static NSString *CollectionViewCellIdentifier = @"CollectionViewCellIdentifier";
 
 - (id)initWithPostInfo:(NSDictionary *)postInfo
        reuseIdentifier:(NSString *)reuseIdentifier;
+- (id)initWithRoomPostInfo:(NSDictionary *)postInfo
+           reuseIdentifier:(NSString *)reuseIdentifier;
 
 - (void)setCollectionViewDataSourceDelegate:(id<UICollectionViewDataSource, UICollectionViewDelegate>)dataSourceDelegate indexPath:(NSIndexPath *)indexPath;
 

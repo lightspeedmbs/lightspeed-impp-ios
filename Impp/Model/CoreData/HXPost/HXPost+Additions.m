@@ -43,6 +43,8 @@
     self.comments = nil;
     self.likes = nil;
     self.postOwner = nil;
+    self.circle_id = @"";
+    
 }
 
 - (BOOL)setValuesFromDict:(NSDictionary *)dict
@@ -58,7 +60,10 @@
     
     if ([HXPost isObjectAvailable:dict[@"customFields"]])
         self.customFields = [NSKeyedArchiver archivedDataWithRootObject:dict[@"customFields"]];
-    
+
+    if ([HXPost isObjectAvailable:dict[@"customFields"][@"circle_id"]])
+        self.circle_id = dict[@"customFields"][@"circle_id"];
+
     if ([HXPost isObjectAvailable:dict[@"created_at"]]){
         NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.zzz'Z'"];
@@ -111,8 +116,13 @@
 {
     if (self.customFields) {
         NSDictionary *customFields = [NSKeyedUnarchiver unarchiveObjectWithData:self.customFields];
-        
-        if (!customFields[@"photoUrls"])return [[NSDictionary alloc]init];
+
+        if (!customFields[@"photoUrls"]&&!customFields[@"custom_fields"][@"photoUrls"]){
+          return [[NSDictionary alloc]init];
+        }else if(customFields[@"custom_fields"][@"photoUrls"]){
+            NSArray *photoUrls = [customFields[@"custom_fields"][@"photoUrls"] componentsSeparatedByString:@","];
+            return @{@"photoUrls":photoUrls};
+        }
         
         NSArray *photoUrls = [customFields[@"photoUrls"] componentsSeparatedByString:@","];
         return @{@"photoUrls":photoUrls};
@@ -132,6 +142,7 @@
                            @"parentType":self.parentType,
                            @"updated_at":self.updated_at,
                            @"id":self.postId,
+                           @"circle_id":self.circle_id,
                            @"customFields":[self getCustomFields]};
     return dict;
 }

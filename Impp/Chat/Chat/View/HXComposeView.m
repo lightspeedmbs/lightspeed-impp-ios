@@ -74,13 +74,13 @@
 {
     [self textFieldResignFirstResponder];
     
-    NSString *button1 = NSLocalizedString(@"拍攝照片", nil);
-    NSString *button2 = NSLocalizedString(@"選取照片", nil);
-    NSString *button3 = NSLocalizedString(@"錄製聲音", nil);
-    //NSString *button4 = NSLocalizedString(@"傳送位置", nil);
-    NSString *button5 = NSLocalizedString(@"語音通話", nil);
-    NSString *button6 = NSLocalizedString(@"視訊通話", nil);
-    NSString *cancelTitle = NSLocalizedString(@"取消", nil);
+    NSString *button1 = NSLocalizedString(@"camera", nil);
+    NSString *button2 = NSLocalizedString(@"choose_a_photo", nil);
+    NSString *button3 = NSLocalizedString(@"voice_message", nil);
+    NSString *button4 = NSLocalizedString(@"location", nil);
+    NSString *button5 = NSLocalizedString(@"call", nil);
+    NSString *button6 = NSLocalizedString(@"video_call", nil);
+    NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
     
     UIActionSheet *actionSheet;
     if (self.isTopicMode) {
@@ -96,7 +96,7 @@
                        delegate:self
                        cancelButtonTitle:cancelTitle
                        destructiveButtonTitle:nil
-                       otherButtonTitles:button1, button2, button3,button5,button6, nil];
+                       otherButtonTitles:button1, button2, button3,button4,button5,button6, nil];
     }
     [actionSheet showInView:self.superview];
 }
@@ -147,12 +147,20 @@
         }
         case 3: {
             if (!self.isTopicMode) {
-                [self.delegate audioCallTapped];
+                [self.delegate shareLocationTapped];
             }
             
             break;
         }
         case 4: {
+            if (!self.isTopicMode) {
+                [self.delegate audioCallTapped];
+            }
+            
+            break;
+        }
+        
+        case 5: {
             if (!self.isTopicMode) {
                [self.delegate videoCallTapped];
             }

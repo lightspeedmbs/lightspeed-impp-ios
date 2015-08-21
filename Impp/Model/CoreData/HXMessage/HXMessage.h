@@ -28,6 +28,8 @@
 @property (nonatomic, retain) NSString * currentClientId;
 @property (nonatomic, retain) NSString * msgId;
 @property (nonatomic, retain) NSString * processStatus;
+
+@property (nonatomic, retain) NSString * senderPhotoUrl;
 @property (nonatomic, retain) HXChat *chat;
 
 @end

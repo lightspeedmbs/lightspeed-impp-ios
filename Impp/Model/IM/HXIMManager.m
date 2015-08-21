@@ -16,10 +16,12 @@
 #import "HXAnLiveViewController.h"
 #import "UserUtil.h"
 #import "NotificationCenterUtil.h"
-
 #import "UIView+Toast.h"
+#import "HXLoginSignupViewController.h"
+#import "HXTabBarViewController.h"
 
-@interface HXIMManager()<AnIMDelegate, AnLiveEventDelegate>
+
+@interface HXIMManager()<AnIMDelegate, AnLiveEventDelegate ,UIAlertViewDelegate>
 @property (strong, nonatomic) NSDate *videoCallStartTime;
 @property BOOL imConnecting;
 @end
@@ -48,6 +50,7 @@
         self.remoteNotificationInfo = [[NSMutableDictionary alloc]initWithCapacity:0];
         self.clientId = [[NSMutableString alloc] initWithCapacity:0];
         _clientStatus = NO;
+        _kicked = NO;
     }
     return self;
 }
@@ -83,6 +86,21 @@
     return nil;
 }
 
+- (void)getStatusForClients:(NSSet *)clientSet
+                    success:(void (^)(NSDictionary *clientsStatus))success
+                    failure:(void (^)(ArrownockException *exception))failure;
+
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.anIM getClientsStatus:clientSet
+                            success:^(NSDictionary *clientsStatus) {
+                                success(clientsStatus);
+                            } failure:^(ArrownockException *exception) {
+                                failure(exception);
+                            }];
+    });
+}
+
 #pragma mark - AnIM Delegate
 
 - (void)anIM:(AnIM *)anIM didGetClientId:(NSString *)clientId exception:(ArrownockException *)exception
@@ -93,80 +111,37 @@
         NSLog(@"AnIM cannot get client ID for chat! %s", __PRETTY_FUNCTION__);
 }
 
-- (void)anIM:(AnIM *)anIM didGetTopicList:(NSArray *)topics exception:(ArrownockException *)exception
-{
-
-    NSMutableSet *topicIds = [[NSMutableSet alloc]initWithCapacity:0];
-    for (NSDictionary *dic in topics){
-        /* EXAMPLE
-         id = 550fbc28f38d66be4f000004;
-         name = "userc,userd,usere";
-         owner = "<null>";
-         parties =     (
-         AIMMLOUFJUKIE4XHNFG2YV9,
-         AIMGQP5MCM61762KK8G1XJD,
-         AIMFTITH9UNHB94MX2OR8YM
-         );
-         "parties_count" = 3;
-         */
-        [MessageUtil updatedTopicSessionWithUsers:dic[@"parties"] topicId:dic[@"id"] topicName:dic[@"name"] topicOwner:dic[@"owner"]];
-        [topicIds addObject:dic[@"id"]];
-    }
-    [UserUtil removeTopicWithTopicIds:topicIds from:self.clientId];
-    
-
-    if (self.topicDelegate)
-    {
-        if ([self.topicDelegate respondsToSelector:@selector(anIMDidGetTopicList:errorCode:exception:)])
-            [self.topicDelegate anIMDidGetTopicList:topics errorCode:exception.errorCode exception:exception.message];
-    }
-    
-    [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
-}
-
 #pragma mark - AnIM Topic Delegate
-
-- (void)anIM:(AnIM *)anIM didCreateTopic:(NSString *)topicId exception:(ArrownockException *)exception
-{
-    if (self.topicDelegate)
-    {
-        if ([self.topicDelegate respondsToSelector:@selector(anIMDidCreateTopic:errorCode:exception:)])
-            [self.topicDelegate anIMDidCreateTopic:topicId errorCode:exception.errorCode exception:exception.message];
-    }
-}
-
-- (void)anIM:(AnIM *)anIM didGetTopicInfo:(NSString *)topicId name:(NSString *)topicName parties:(NSSet *)parties createdDate:(NSDate *)createdDate exception:(ArrownockException *)exception
-{
-    [MessageUtil updatedTopicSessionWithUsers:parties topicId:topicId topicName:topicName topicOwner:nil];
-    
-    if ([self.topicDelegate respondsToSelector:@selector(anIMDidGetTopicInfo:name:parties:createdDate:exception:)])
-    {
-        [self.topicDelegate anIMDidGetTopicInfo:topicId name:topicName parties:parties createdDate:createdDate exception:exception.message];
-    }
-}
-
-- (void)anIM:(AnIM *)anIM didGetClientsStatus:(NSDictionary *)clientsStatus exception:(ArrownockException *)exception
-{
-    if ([self.topicDelegate respondsToSelector:@selector(anIMDidGetClientsStatus:exception:)])
-    {
-        [self.topicDelegate anIMDidGetClientsStatus:clientsStatus exception:exception.message];
-    }
-}
-
 - (void)anIM:(AnIM *)anIM didUpdateStatus:(BOOL)status exception:(ArrownockException *)exception
 {
     NSLog(@"AnIM status changed: %i", status);
     _imConnecting = NO;
     _clientStatus = status;
     if (self.isAppEnterBackground)return;
-        
+    
     if (!status)
     {
-        UIWindow *displayWindow = [[[UIApplication sharedApplication] delegate] window];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [displayWindow makeImppToast:@"IM Disconnect" navigationBarHeight:0];
-            [self performSelector:@selector(checkIMConnection) withObject:nil afterDelay:5.0];
-        });
+        if ([exception.message isEqualToString:@"kicked off"]) {
+            
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"kicked", nil)
+                                                             message:nil
+                                                            delegate:self
+                                                   cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                                                   otherButtonTitles:nil,nil];
+            alert.alertViewStyle = UIAlertViewStyleDefault;
+            _kicked = YES;
+            [alert show];
+        }else{
+            if (!_kicked) {
+                UIWindow *displayWindow = [[[UIApplication sharedApplication] delegate] window];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [displayWindow makeImppToast:@"IM Disconnect" navigationBarHeight:0];
+                    [self performSelector:@selector(checkIMConnection) withObject:nil afterDelay:5.0];
+                });
+            }
+            
+        }
+        
         
     }else{
         
@@ -176,7 +151,32 @@
         });
         /* just get topic once */
         if (!self.isGetTopicList) {
-            [self.anIM getMyTopics];
+            [self.anIM getTopicList:_clientId success:^(NSMutableArray *topicList) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSMutableSet *topicIds = [[NSMutableSet alloc]initWithCapacity:0];
+                    for (NSDictionary *dic in topicList){
+                        /* EXAMPLE
+                         id = 550fbc28f38d66be4f000004;
+                         name = "userc,userd,usere";
+                         owner = "<null>";
+                         parties =     (
+                         AIMMLOUFJUKIE4XHNFG2YV9,
+                         AIMGQP5MCM61762KK8G1XJD,
+                         AIMFTITH9UNHB94MX2OR8YM
+                         );
+                         "parties_count" = 3;
+                         */
+                        [MessageUtil updatedTopicSessionWithUsers:dic[@"parties"] topicId:dic[@"id"] topicName:dic[@"name"] topicOwner:dic[@"owner"]];
+                        [topicIds addObject:dic[@"id"]];
+                    }
+                    [UserUtil removeTopicWithTopicIds:topicIds from:self.clientId];
+                    
+                    [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
+                });
+                
+            } failure:^(ArrownockException *exception) {
+                NSLog(@"AnIm getTopicList failed, error : %@", exception.getMessage);
+            }];
             self.isGetTopicList = YES;
         }
         
@@ -187,15 +187,19 @@
     
 }
 
-#pragma mark - AnIM Chat Delgate
+//- (void)anIM:(AnIM *)anIM didGetClientsStatus:(NSDictionary *)clientsStatus exception:(ArrownockException *)exception
+//{
+//    if ([self.topicDelegate respondsToSelector:@selector(anIMDidGetClientsStatus:exception:)])
+//    {
+//        [self.topicDelegate anIMDidGetClientsStatus:clientsStatus exception:exception.message];
+//    }
+//    if ([self.clientStatusDelegate respondsToSelector:@selector(anIMDidGetClientsStatus:exception:)])
+//    {
+//        [self.clientStatusDelegate anIMDidGetClientsStatus:clientsStatus exception:exception.message];
+//    }
+//}
 
-- (void)anIM:(AnIM *)anIM didAddClientsWithException:(ArrownockException *)exception
-{
-    if ([self.chatDelegate respondsToSelector:@selector(anIMDidAddClientsWithException:)])
-    {
-        [self.chatDelegate anIMDidAddClientsWithException:exception.message];
-    }
-}
+#pragma mark - AnIM Chat Delgate
 
 - (void)anIM:(AnIM *)anIM messageSent:(NSString *)messageId
 {
@@ -276,7 +280,7 @@
 
 - (void)anIM:(AnIM *)anIM didReceiveBinary:(NSData *)data fileType:(NSString *)fileType customData:(NSDictionary *)customData from:(NSString *)from parties:(NSSet *)parties messageId:(NSString *)messageId at:(NSNumber *)timestamp
 {
-    if ([fileType isEqualToString:@"send"]) {
+    if ([fileType isEqualToString:@"send" ]) {
         if ([customData[@"type"] isEqualToString:@"approve"]) {
             
             NSLog(@"received approve message");
@@ -286,10 +290,10 @@
             /* show toast*/
             UIWindow *displayWindow = [[[UIApplication sharedApplication] delegate] window];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [displayWindow makeImppToast:NSLocalizedString(@"好友邀請同意", nil) navigationBarHeight:0];
+                [displayWindow makeImppToast:NSLocalizedString(@"accepted_friend_request", nil) navigationBarHeight:0];
             });
-
-        
+            
+            
             [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
             
         }else if ([customData[@"type"] isEqualToString:@"send"]){
@@ -298,7 +302,7 @@
             /* show toast*/
             UIWindow *displayWindow = [[[UIApplication sharedApplication] delegate] window];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [displayWindow makeImppToast:NSLocalizedString(@"收到好友邀請", nil) navigationBarHeight:0];
+                [displayWindow makeImppToast:NSLocalizedString(@"received_friend_request", nil) navigationBarHeight:0];
             });
             NSNumber *unreadCount = [[NSUserDefaults standardUserDefaults] objectForKey:@"unreadFriendRequestCount"];
             [[NSUserDefaults standardUserDefaults] setObject:@([unreadCount intValue]+1) forKey:@"unreadFriendRequestCount"];
@@ -314,7 +318,7 @@
                 [displayWindow makeImppToast:customData[@"notification_alert"] navigationBarHeight:0];
             });
         }
-            
+        
         return;
     }
     
@@ -391,14 +395,23 @@
 
 - (void) onReceivedInvitation:(BOOL)isValid sessionId:(NSString*)sessionId partyId:(NSString*)partyId type:(NSString*)type createdAt:(NSDate*)createdAt
 {
-    [HXIMManager manager].anLiveCallStr = nil;
-    HXUser *user = [UserUtil getHXUserByClientId:partyId];
-    HXAnLiveViewController *vc = [[HXAnLiveViewController alloc] initWithClientName:user.userName
-                                                                clientPhotoImageUrl:user.photoURL
-                                                                               mode:[type isEqualToString:@"record"] ? AnLiveAudioCall : AnLiveVideoCall
-                                                                               role:AnLiveReciever];
+    if(isValid)
+    {
+        [HXIMManager manager].anLiveCallStr = nil;
+        HXUser *user = [UserUtil getHXUserByClientId:partyId];
+        HXAnLiveViewController *vc = [[HXAnLiveViewController alloc] initWithClientName:user.userName
+                                                                    clientPhotoImageUrl:user.photoURL
+                                                                                   mode:[type isEqualToString:@"voice"] ? AnLiveAudioCall : AnLiveVideoCall
+                                                                                   role:AnLiveReciever];
     
-    [[self topViewController] presentViewController:vc animated:YES completion:nil];
+//    UIViewController *presentingVC = [[UIApplication sharedApplication] keyWindow].rootViewController;
+//    if (presentingVC.presentedViewController) {
+//        [presentingVC.presentedViewController presentViewController:vc animated:YES completion:nil];
+//    } else {
+//        [presentingVC presentViewController:vc animated:YES completion:nil];
+//    }
+        [[self topViewController] presentViewController:vc animated:YES completion:nil];
+    }
 }
 
 - (void) onLocalVideoViewReady:(AnLiveLocalVideoView*)view
@@ -427,7 +440,7 @@
     int min = passed / 60;
     int second = passed - min *60;
     NSString *duration = [NSString stringWithFormat:@"%02d:%02d",min,second];
-
+    
     [[NSNotificationCenter defaultCenter]postNotificationName:FinishVideoAudioCall
                                                        object:@{@"clientId":partyId,
                                                                 @"duration":duration}];
@@ -481,8 +494,10 @@
     NSData *data = [[NSData alloc] initWithBytes:&j length:sizeof(j)];
     [[[HXIMManager manager]anIM] sendBinary:data
                                    fileType:@"send"
-                                 customData:@{@"type":@"approve"}
-                                  toClients:[NSSet setWithObject:clientId]
+                                 customData:@{@"type":@"approve"
+                                              ,@"notification_alert":[NSString stringWithFormat:NSLocalizedString(@"%@_is_now_your_friend",nil),[HXUserAccountManager manager].userName]
+                                              }
+                                   toClient:clientId
                              needReceiveACK:NO];
 }
 
@@ -493,8 +508,11 @@
     [[[HXIMManager manager]anIM] sendBinary:data
                                    fileType:@"send"
                                  customData:@{@"type":@"send",
-                                              @"username":username}
-                                  toClients:[NSSet setWithObject:clientId]
+                                              @"username":username,
+                                              @"notification_alert":[NSString stringWithFormat:NSLocalizedString(@"%@_send_you_a_friend_request", nil) ,[HXUserAccountManager manager].userName]
+                                              }
+    
+                                   toClient:clientId
                              needReceiveACK:NO];
 }
 
@@ -535,6 +553,37 @@
         return rootViewController;
     }
 }
+#pragma mark - alertView delegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (buttonIndex == [alertView cancelButtonIndex]){
+        
+        [self performSelector:@selector(logout) withObject:nil afterDelay:0.3];
+        //[self logout];
+        
+    }
+}
 
+
+- (void)logout
+{
+    [[HXUserAccountManager manager]userSignedOut];
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
+//    UITabBarController *mainView;
+//    
+//    [mainView setSelectedIndex:1];
+//    
+//    UIViewController *view = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    for (UIViewController *childview in view.childViewControllers) {
+//        if ([childview isKindOfClass:[UITabBarController class]]) {
+//            mainView = (UITabBarController*)childview;
+//        }
+//    }
+    UIWindow *window = [[[UIApplication sharedApplication] delegate] window];
+    HXTabBarViewController *vc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
+    window.rootViewController = vc;
+    [window makeKeyAndVisible];
+    [window.rootViewController presentViewController:[mainStoryboard instantiateViewControllerWithIdentifier:@"HXLoginSignupView"] animated:NO completion:nil];
+    
+}
 
 @end

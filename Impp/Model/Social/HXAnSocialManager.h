@@ -29,5 +29,7 @@ typedef enum {
 
 - (void)fetchFriendInfo;
 
+- (void)addDefaultFriend:(NSString *)currentUserId;
+
 - (NSString *)getFriendUserIds;
 @end

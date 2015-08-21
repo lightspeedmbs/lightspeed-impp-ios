@@ -13,6 +13,10 @@
 #import "HXChatViewController.h"
 #import "UIColor+CustomColor.h"
 #import "HXCustomButton.h"
+#import "UserUtil.h"
+#import "HXUserAccountManager.h"
+#import "HXAnSocialManager.h"
+#import "UIView+Toast.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
 #define SCREEN_WIDTH self.view.frame.size.width
@@ -82,8 +86,21 @@
     self.userNameLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:self.userNameLabel];
     
-    HXCustomButton *chatButton = [[HXCustomButton alloc]initWithTitle:@"傳送訊息" titleColor:[UIColor color1] backgroundColor:[UIColor color5]];
-    [chatButton addTarget:self action:@selector(chatButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    HXCustomButton *chatButton;
+    
+    if ([UserUtil checkFriendRelationshipWithCliendId:_userInfo.clientId]) {
+        chatButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"send_chat_message", nil) titleColor:[UIColor color3] backgroundColor:[UIColor color5]];
+    }else if ([UserUtil checkFollowRelationshipWithCliendId:_userInfo.clientId]){
+        chatButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"sent", nil) titleColor:[UIColor color1] backgroundColor:[UIColor color5]];
+        chatButton.userInteractionEnabled = NO;
+        
+    }else{
+        chatButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"Add", nil) titleColor:[UIColor color3] backgroundColor:[UIColor color5]];
+    }
+    
+    
+    [chatButton addTarget:self action:@selector(customCellButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+
     CGRect frame;
     frame = chatButton.frame;
     frame.origin.x = (SCREEN_WIDTH - chatButton.frame.size.width)/2;
@@ -120,6 +137,51 @@
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+    
+}
+
+- (void)customCellButtonTapped:(UIButton *)sender
+{
+    if ([UserUtil checkFriendRelationshipWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:_userInfo]) {
+        [self dismissViewControllerAnimated:NO completion:nil];
+        HXChatViewController *chatVc = [[HXIMManager manager]getChatViewWithTargetClientId:self.userInfo.clientId targetUserName:self.userInfo.userName currentUserName:[HXUserAccountManager manager].userName];
+        [self.previousVc.navigationController pushViewController:chatVc animated:YES];
+    }else{
+        HXUser *user = self.userInfo;
+        HXCustomButton *button = (HXCustomButton *)sender;
+        [button updateTitle:NSLocalizedString(@"sent", nil) TitleColor:[UIColor color1]];
+        button.enabled = NO;
+        NSDictionary *params = @{@"user_id":[HXUserAccountManager manager].userId,
+                                 @"target_user_id":user.userId};
+        
+        [[HXAnSocialManager manager]sendRequest:@"friends/requests/send.json" method:AnSocialManagerPOST params:params success:^(NSDictionary* response){
+            NSLog(@"success log: %@",[response description]);
+            
+        } failure:^(NSDictionary* response){
+            
+            NSLog(@"Error: %@", [[response objectForKey:@"meta"] objectForKey:@"message"]);
+        }];
+        
+        params = @{@"user_id":[HXUserAccountManager manager].userId,
+                   @"target_user_id":user.userId};
+        
+        [[HXAnSocialManager manager]sendRequest:@"friends/add.json" method:AnSocialManagerPOST params:params success:^(NSDictionary* response){
+            NSLog(@"success log: %@",[response description]);
+            
+            HXUser *user = [UserUtil saveUserIntoDB:response[@"response"][@"friend"]];
+            [UserUtil updatedUserFollowsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:user];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.view makeImppToast:NSLocalizedString(@"sent_friend_request", nil) navigationBarHeight:64];
+            });
+        } failure:^(NSDictionary* response){
+            
+            NSLog(@"Error: %@", [[response objectForKey:@"meta"] objectForKey:@"message"]);
+        }];
+        
+        [[HXIMManager manager] sendFriendRequestMessageWithClientId:user.clientId targetUserName:user.userName];
+        
+    }
     
 }
 

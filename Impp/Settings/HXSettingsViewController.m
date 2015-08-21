@@ -34,6 +34,10 @@
     [super viewDidLoad];
     [self initView];
     [self initNavigationBar];
+    [[NSNotificationCenter defaultCenter]addObserver:self
+                                            selector:@selector(resetUser)
+                                                name:@"loggedIn"
+                                              object:nil];
 }
 
 - (void)initNavigationBar
@@ -79,7 +83,7 @@
     self.userNameLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:self.userNameLabel];
     
-    HXCustomButton *logoutButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"登出", nil) titleColor:[UIColor color1] backgroundColor:[UIColor color5]];
+    HXCustomButton *logoutButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"logout", nil) titleColor:[UIColor color1] backgroundColor:[UIColor color5]];
     [logoutButton addTarget:self action:@selector(logoutButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     CGRect frame;
     frame = logoutButton.frame;
@@ -94,18 +98,22 @@
 
 - (void)logoutButtonTapped
 {
-    [self dismissViewControllerAnimated:NO completion:nil];
+    //[self dismissViewControllerAnimated:NO completion:nil];
+    self.photoImageView.image = [UIImage imageNamed:@"friend_default"];
+    [self.tabBarController setSelectedIndex:0];
+    [self presentViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"HXLoginSignupView"] animated:NO completion:nil];
     [[HXUserAccountManager manager]userSignedOut];
-    HXLoginSignupViewController *lgVc = [[HXLoginSignupViewController alloc]init];
-    [UIApplication sharedApplication].keyWindow.rootViewController = lgVc;
+    
+//    HXLoginSignupViewController *lgVc = [[HXLoginSignupViewController alloc]init];
+//    [UIApplication sharedApplication].keyWindow.rootViewController = lgVc;
 }
 
 - (void)photoTapped
 {
-    NSString *button1 = NSLocalizedString(@"拍攝照片", nil);
-    NSString *button2 = NSLocalizedString(@"選取照片", nil);
+    NSString *button1 = NSLocalizedString(@"camera", nil);
+    NSString *button2 = NSLocalizedString(@"choose_a_photo", nil);
     
-    NSString *cancelTitle = NSLocalizedString(@"取消", nil);
+    NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
     UIActionSheet *actionSheet = [[UIActionSheet alloc]
                                   initWithTitle:nil
                                   delegate:self
@@ -216,7 +224,7 @@
     [viewController.navigationItem setTitle:@""];
     viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor whiteColor];
     viewController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:NSLocalizedString(@"取消", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelBarButtonTapped)];
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelBarButtonTapped)];
     viewController.navigationItem.rightBarButtonItem = cancelButton;
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
 }
@@ -249,6 +257,7 @@
             if (response[@"response"][@"user"][@"photo"]) {
                 NSString *photoUrl = response[@"response"][@"user"][@"photo"][@"url"];
                 [HXUserAccountManager manager].userInfo.photoURL = photoUrl;
+                [HXUserAccountManager manager].photoUrl = photoUrl;
                 NSError *error;
                 [[CoreDataUtil sharedContext] save:&error];
                 if (error) {
@@ -288,6 +297,22 @@
     
 }
 
+-(void)resetUser{
+    if ([HXUserAccountManager manager].photoUrl){
+        SDWebImageManager *manager = [SDWebImageManager sharedManager];
+        [manager downloadWithURL:[NSURL URLWithString:[HXUserAccountManager manager].photoUrl]
+                         options:0
+                        progress:^(NSInteger receivedSize, NSInteger expectedSize){}
+                       completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished){
+                           if (image) {
+                               self.photoImageView.image = image;
+                               self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
+                           }
+                           
+                       }];
+    }
+    self.userNameLabel.text = [HXUserAccountManager manager].userInfo.userName;
+}
 
 
 @end

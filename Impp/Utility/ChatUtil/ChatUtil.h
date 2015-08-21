@@ -12,7 +12,7 @@
 
 @interface ChatUtil : NSObject
 
-+ (HXChat *)createChatSessionWithUser:(NSArray *)users topicId:(NSString *)topicId topicName:(NSString *)topicName currentUserName:(NSString *)currentUserName topicOwnerClientId:(NSString *)topicOwnerClientId;
++ (HXChat *)createChatSessionWithUser:(NSSet *)users topicId:(NSString *)topicId topicName:(NSString *)topicName currentUserName:(NSString *)currentUserName topicOwnerClientId:(NSString *)topicOwnerClientId;
 + (HXChat *)createChatSessionWithUser:(HXUser *)user;
 + (HXChat *)createChatSessionWithCurrentClientId:(NSString *)currentClientId targetClientId:(NSString *)targetClientId currentUserName:(NSString *)currentUserName targetUserName:(NSString *)targetUserName;
 

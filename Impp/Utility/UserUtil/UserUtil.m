@@ -29,6 +29,23 @@
         return nil;
 }
 
++ (HXUser *)getHXUserByUserName:(NSString *)userName
+{
+    NSArray* results =
+    [CoreDataUtil getWithEntityName:@"HXUser"
+                          predicate:[NSPredicate predicateWithFormat
+                                     :@"%K == %@", @"userName", userName]];
+    if (results.count > 0) {
+#ifdef DEBUG
+        if (results.count > 1) { // the result count should not > 1
+            //abort();
+        }
+#endif
+        return results[0];
+    } else
+        return nil;
+}
+
 + (HXUser *)getHXUserByUserId:(NSString *)userId currentUserId:(NSString *)currentUserId
 {
     NSArray* results =
@@ -203,6 +220,15 @@
     return hxUser;
 }
 
++ (void)updateUser:(HXUser*)user PhotoUrl:(NSString *)photoUrl{
+    user.photoURL = photoUrl;
+    
+    NSError *error;
+    if (![[CoreDataUtil sharedContext] save:&error]) {
+        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+    }
+}
+
 + (void)removeTopic:(HXChat *)topic from:(NSString *)clientId
 {
     [[UserUtil getHXUserByClientId:clientId] removeTopicsObject:topic];
@@ -236,6 +262,7 @@
 
 + (NSDictionary *)reformUserInfoDic:(NSDictionary *)userInfo
 {
+
     NSDictionary* dict = @{@"userName":userInfo[@"username"],
                            @"userId":userInfo[@"id"],
                            @"clientId":userInfo[@"clientId"] ?userInfo[@"clientId"] : @"",

@@ -8,7 +8,9 @@
 
 #import "HXFriendViewController.h"
 #import "HXIMManager.h"
+#import "HXAnRoom+Additions.h"
 #import "HXUser+Additions.h"
+#import "AnRoomUtil.h"
 #import "HXUserAccountManager.h"
 #import "HXAnSocialManager.h"
 #import "CoreDataUtil.h"
@@ -38,6 +40,7 @@
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *friendsArray;
 @property (strong, nonatomic) NSMutableArray *topicsArray;
+@property (strong, nonatomic) NSMutableArray *tempArray;
 @property (strong, nonatomic) NSMutableArray *friendsFilterArray;
 @property (strong, nonatomic) NSMutableArray *topicsFilterArray;
 @property (strong, nonatomic) UISearchBar* contactSearchBar;
@@ -89,10 +92,12 @@
     [self.contactSearchBar setShowsCancelButton:NO];
     self.contactSearchBar.delegate = self;
     self.contactSearchBar.tintColor = [UIColor color11];
-    self.contactSearchBar.placeholder = NSLocalizedString(@"搜尋好友和群組", nil);
-    
-    [[UIBarButtonItem appearanceWhenContainedIn:[UISearchBar class], nil] setTitle:NSLocalizedString(@"取消", nil)];
-    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTintColor:[UIColor color2]];
+    self.contactSearchBar.placeholder = NSLocalizedString(@"search_friends_and_groups", nil);
+    if ([HXAppUtility isiOS8]) {
+        [[UIBarButtonItem appearanceWhenContainedIn:[UISearchBar class], nil] setTitle:NSLocalizedString(@"Cancel", nil)];
+        [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTintColor:[UIColor color2]];
+    }
+
     [self.view addSubview:self.contactSearchBar];
     
     /* search controller */
@@ -101,7 +106,7 @@
     [self.searchController setValue:[NSNumber numberWithInt:UITableViewStyleGrouped]
                              forKey:@"_searchResultsTableViewStyle"];
     self.searchController.searchResultsTableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
-    self.searchController.searchResultsTitle = @"沒有結果";
+    self.searchController.searchResultsTitle = NSLocalizedString(@"no_result", nil) ;
     [self setSearchController:self.searchController];
     [self.searchController setDelegate:self];
     [self.searchController setSearchResultsDelegate:self];
@@ -134,10 +139,10 @@
 
 - (void)createButtonTapped
 {
-    NSString *button1 = NSLocalizedString(@"加入新好友", nil);
-    NSString *button2 = NSLocalizedString(@"新增群組聊天", nil);
+    NSString *button1 = NSLocalizedString(@"add_friend", nil);
+    NSString *button2 = NSLocalizedString(@"create_group_chat", nil);
     
-    NSString *cancelTitle = NSLocalizedString(@"取消", nil);
+    NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
     UIActionSheet *actionSheet = [[UIActionSheet alloc]
                                   initWithTitle:nil
                                   delegate:self
@@ -186,6 +191,7 @@
         NSString *lastName2 = obj2.userName;
         return [lastName1 compare:lastName2]; }] mutableCopy];
     
+    //[self filterOutAnRoomChat];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
     });
@@ -244,16 +250,16 @@
     if (tableView == self.searchController.searchResultsTableView) {
         switch(section)
         {
-            case 0: return (self.topicsFilterArray.count) ? NSLocalizedString(@"群組列表", nil) : @"";
-            case 1: return (self.friendsFilterArray.count) ? NSLocalizedString(@"好友列表", nil) : @"";
+            case 0: return (self.topicsFilterArray.count) ? NSLocalizedString(@"group_list", nil) : @"";
+            case 1: return (self.friendsFilterArray.count) ? NSLocalizedString(@"friend_list", nil) : @"";
             default:return nil;
         };
     }else{
         switch(section)
         {
             case 0: return @"";
-            case 1: return NSLocalizedString(@"群組列表", nil);
-            case 2: return NSLocalizedString(@"好友列表", nil);
+            case 1: return NSLocalizedString(@"group_list", nil);
+            case 2: return NSLocalizedString(@"friend_list", nil);
             default:return nil;
         };
     }
@@ -298,7 +304,14 @@
         if (indexPath.section == 0) {
             HXChat *topic = self.topicsFilterArray[indexPath.row];
             title = [NSString stringWithFormat:@"%@ (%d)",topic.topicName,(int)topic.users.count + 1];
+            
+            if ([topic.isAnRoomChat isEqualToString:@"_ANROOM_"]) {
+                HXAnRoom *anroom = [AnRoomUtil getRoomByTopicId:topic.topicId];
+                photoUrl = anroom.toDict[@"photoUrl"];
+            }
             image = [UIImage imageNamed:@"friend_group"];
+ 
+            
         }else{
             HXUser *user = self.friendsFilterArray[indexPath.row];
             title = user.userName;
@@ -310,7 +323,7 @@
         
         if (indexPath.section == 0){
             
-            title = NSLocalizedString(@"好友請求", nil);
+            title = NSLocalizedString(@"friend_request", nil);
             image = [UIImage imageNamed:@"friend_request"];
             NSNumber *unreadCount = [[NSUserDefaults standardUserDefaults] objectForKey:@"unreadFriendRequestCount"];
             badgeValue = [unreadCount integerValue];
@@ -318,8 +331,13 @@
         }else if (indexPath.section == 1){
             NSArray *tests = self.topicsArray;
             HXChat *chat = tests[indexPath.row];
-            title = [NSString stringWithFormat:@"%@ (%d)",chat.topicName,(int)chat.users.count + 1];
+            title = [NSString stringWithFormat:@"%@ (%d)",chat.topicName,(int)chat.users.count ];
+            if ([chat.isAnRoomChat isEqualToString:@"_ANROOM_"]) {
+                HXAnRoom *anroom = [AnRoomUtil getRoomByTopicId:chat.topicId];
+                photoUrl = anroom.toDict[@"photoUrl"];
+            }
             image = [UIImage imageNamed:@"friend_group"];
+            
             
         }else {
             HXUser *user = self.friendsArray[indexPath.row];
@@ -435,5 +453,40 @@
 }
 
 
+- (void)filterOutAnRoomChat{
+    NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"isAnRoomChat CONTAINS %@",@"ANROOM"];
+    _tempArray = [[NSMutableArray alloc]initWithCapacity:0];
+    _tempArray = [[self.topicsArray filteredArrayUsingPredicate:resultPredicate]mutableCopy];
+    [self.topicsArray removeObjectsInArray:_tempArray];
+    //self.topicsArray =  [_tempArray mutableCopy];
+}
+
+-(void)searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller{
+    
+    self.searchDisplayController.searchBar.showsCancelButton = YES;
+    UIButton *cancelButton;
+    UIView *topView = self.searchDisplayController.searchBar.subviews[0];
+    for (UIView *subView in topView.subviews) {
+        if ([subView isKindOfClass:NSClassFromString(@"UINavigationButton")]) {
+            cancelButton = (UIButton*)subView;
+        }
+    }
+    if (cancelButton) {
+        //Set the new title of the cancel button
+        [cancelButton setTitle:NSLocalizedString(@"Cancel", nil) forState:UIControlStateNormal];
+    }
+}
+
+#pragma mark - UISearchBar Delegate
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+{
+    self.contactSearchBar.placeholder = NSLocalizedString(@"please_enter_friends_and_groups_name", nil);
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
+{
+    self.contactSearchBar.placeholder = NSLocalizedString(@"search_friends_and_groups", nil);
+}
 
 @end

@@ -48,7 +48,7 @@
 
 - (void)initView
 {
-    NSString *titleText = self.commentInfo.targetUser ? [NSString stringWithFormat:@"%@ 回覆 %@",self.commentInfo.commentOwner.userName, self.commentInfo.targetUser.userName] : self.commentInfo.commentOwner.userName;
+    NSString *titleText = self.commentInfo.targetUser ? [NSString stringWithFormat:NSLocalizedString(@"%@_reply_%@", nil) ,self.commentInfo.commentOwner.userName, self.commentInfo.targetUser.userName] : self.commentInfo.commentOwner.userName;
     self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(56, 10, SCREEN_WIDTH - 100 - 15, 16)];
     self.titleLabel.text = titleText;
     self.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Medium" size:16];

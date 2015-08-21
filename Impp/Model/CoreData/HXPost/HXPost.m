@@ -31,5 +31,5 @@
 @dynamic comments;
 @dynamic likes;
 @dynamic postOwner;
-
+@dynamic circle_id;
 @end

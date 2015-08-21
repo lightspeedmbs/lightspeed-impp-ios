@@ -24,6 +24,7 @@ typedef enum {
 @interface HXCustomTableViewCell : UITableViewCell
 @property (weak, nonatomic) id<HXCustomCellSearchDelegate> delegate;
 @property (weak, nonatomic) id<HXCustomCellDefaultDelegate> defaultDelegate;
+@property (strong, nonatomic) UILabel *statusLabel;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier title:(NSString *)title photoUrl:(NSString *)photoUrl image:(UIImage *)image badgeValue:(NSInteger)badgeValue style:(HXCustomCellStyle)customCellStyle;
 - (void)reuseCellWithTitle:(NSString *)title photoUrl:(NSString *)photoUrl image:(UIImage *)image badgeValue:(NSInteger)badgeValue;

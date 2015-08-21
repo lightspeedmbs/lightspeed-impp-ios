@@ -8,6 +8,9 @@
 
 #import "HXMessageTableViewCell.h"
 #import "HXAppUtility.h"
+#import "HXFriendProfileViewController.h"
+#import "HXUser.h"
+#import "UserUtil.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #define SENT_MESSAGE_BACKGROUND_OFFSET    20
 #define SENT_BINARY_BACKGROUND_OFFSET     10
@@ -34,10 +37,11 @@
 @property (strong, nonatomic) UIImageView *bubbleDot;
 @property (strong, nonatomic) UIImageView *binaryDataImage;
 @property (strong, nonatomic) UIImageView *photo;
-@property (strong, nonatomic) UIImageView *photoMask;
+//@property (strong, nonatomic) UIImageView *photoMask;
 @property (strong, nonatomic) NSData *imageData;
 @property (strong, nonatomic) NSString *userPhotoUrlString;
 @property (strong, nonatomic) UIImageView *sendingArrow;
+//@property (strong, nonatomic) id defaultDelegate;
 @property BOOL isRead;
 @end
 
@@ -131,6 +135,19 @@ profileImageUrlString:(NSString *)profileImageUrlString
     CGRect frame;
     
     self.messageTextView = [[UILabel alloc]initWithFrame:CGRectMake(14, 50/2, 352/2, 30/2)];
+//    NSMutableString *modifiedMessage;
+//    modifiedMessage = [NSMutableString stringWithString:self.message];
+//    if ([self.message hasPrefix:@"[Video"]) {
+//        [modifiedMessage replaceOccurrencesOfString:@"Video Call" withString:NSLocalizedString(@"video_call", nil) options:NSCaseInsensitiveSearch range:NSMakeRange(1, modifiedMessage.length-5)];
+//    }
+//    else if ([self.message hasPrefix:@"[视频通话"]) {
+//        //modifiedMessage = [NSMutableString stringWithString:self.message];
+//        [modifiedMessage replaceOccurrencesOfString:@"视频通话" withString:NSLocalizedString(@"video_call", nil) options:NSCaseInsensitiveSearch range:NSMakeRange(1, modifiedMessage.length-5)];
+//    }
+//    else if ([self.message hasPrefix:@"[視訊通話"]) {
+//        //modifiedMessage = [NSMutableString stringWithString:self.message];
+//        [modifiedMessage replaceOccurrencesOfString:@"視訊通話" withString:NSLocalizedString(@"video_call", nil) options:NSCaseInsensitiveSearch range:NSMakeRange(1, modifiedMessage.length-5)];
+//    }
     self.messageTextView.text = self.message;
     self.messageTextView.font = [UIFont fontWithName:@"STHeitiTC-Light" size:30/2];
     self.messageTextView.textColor = [HXAppUtility hexToColor:0x58595b alpha:1];
@@ -168,15 +185,18 @@ profileImageUrlString:(NSString *)profileImageUrlString
         
         self.height = self.messageTextView.frame.size.height + 50/2 + 10;
         
-        self.photoMask = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"contact_mask"]];
-        self.photoMask.frame = CGRectMake(0, 0, self.photoMask.frame.size.width, self.photoMask.frame.size.height);
-        [self addSubview:self.photoMask];
-        
+//        self.photoMask = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"contact_mask"]];
+//        self.photoMask.frame = CGRectMake(0, 0, self.photoMask.frame.size.width, self.photoMask.frame.size.height);
+//        [self addSubview:self.photoMask];
+//        
         self.photo = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"friend_default"]];
         self.photo.frame = CGRectMake(12,0,36,36);
         self.photo.layer.cornerRadius = self.photo.bounds.size.width/2;
         self.photo.clipsToBounds = YES;
         
+        UITapGestureRecognizer *photoTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(chatphotoTapped)];
+        [self.photo addGestureRecognizer:photoTap];
+        self.photo.userInteractionEnabled = YES;
         if (self.userPhotoUrlString)
         {
             if (![self.userPhotoUrlString isEqualToString:@""]) {
@@ -221,8 +241,10 @@ profileImageUrlString:(NSString *)profileImageUrlString
         [self.nameLabel sizeToFit];
         
 
-        
-        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_left"];
+        UIImage *bImage = [UIImage imageNamed:@"bubble_left"];
+        UIEdgeInsets edgeInsets = UIEdgeInsetsMake(bImage.size.height/2-1, bImage.size.width/2-1, bImage.size.height/2+1, bImage.size.width/2+1);
+        UIImage *backgroundImage = [bImage resizableImageWithCapInsets:edgeInsets];
+//        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_left"];
         self.messageBackground  = [[UIImageView alloc] init];
         self.messageBackground.image = backgroundImage;
         frame = self.messageBackground.frame;
@@ -286,9 +308,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = NSLocalizedString(@"上午", nil);
+                timeHint = NSLocalizedString(@"AM", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = NSLocalizedString(@"下午", nil);
+                timeHint = NSLocalizedString(@"PM", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -317,9 +339,11 @@ profileImageUrlString:(NSString *)profileImageUrlString
         frame.origin.y = 10;
         frame.origin.x = 10;
         self.messageTextView.frame = frame;
-        
-        
-        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_right"];
+
+        UIImage *bImage = [UIImage imageNamed:@"bubble_right"];
+        UIEdgeInsets edgeInsets = UIEdgeInsetsMake(bImage.size.height/2-1, bImage.size.width/2-1, bImage.size.height/2+1, bImage.size.width/2+1);
+        UIImage *backgroundImage = [bImage resizableImageWithCapInsets:edgeInsets];
+//        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_right"];
         self.messageBackground = [[UIImageView alloc]initWithImage:backgroundImage];
         frame = self.messageBackground.frame;
         
@@ -384,9 +408,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = NSLocalizedString(@"上午", nil);
+                timeHint = NSLocalizedString(@"AM", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = NSLocalizedString(@"下午", nil);
+                timeHint = NSLocalizedString(@"PM", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -405,7 +429,7 @@ profileImageUrlString:(NSString *)profileImageUrlString
         }
         
         self.readAckLabel = [[UILabel alloc] init];
-        self.readAckLabel.text = NSLocalizedString(@"已讀", nil);
+        self.readAckLabel.text = NSLocalizedString(@"read", nil);
         self.readAckLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:20.0f/2];
         self.readAckLabel.textColor = [HXAppUtility hexToColor:0x999999 alpha:1];
         self.readAckLabel.numberOfLines = 1;
@@ -492,17 +516,20 @@ profileImageUrlString:(NSString *)profileImageUrlString
         
         self.messageTextView.textColor = [HXAppUtility hexToColor:0x58595b alpha:1];
 
-    
+        
         if (!self.photo) {
             self.photo = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"friend_default"]];
             self.photo.frame = CGRectMake(12,0,36,36);
             self.photo.layer.cornerRadius = self.photo.bounds.size.width/2;
             self.photo.clipsToBounds = YES;
+            
             [self addSubview:self.photo];
         }
+        UITapGestureRecognizer *photoTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(chatphotoTapped)];
+        [self.photo addGestureRecognizer:photoTap];
+        self.photo.userInteractionEnabled = YES;
         if (self.userPhoto)
         {
-            
             self.photo.image = self.userPhoto;
         }
         if (self.userPhotoUrlString) {
@@ -525,7 +552,7 @@ profileImageUrlString:(NSString *)profileImageUrlString
         
         
         self.photo.hidden = NO;
-        self.photoMask.hidden = NO;
+        //self.photoMask.hidden = NO;
         
         if (!self.bubbleDot) {
             self.bubbleDot = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"bubble_dot"]];
@@ -549,8 +576,11 @@ profileImageUrlString:(NSString *)profileImageUrlString
             self.nameLabel.text = self.ownerName;
             [self.nameLabel sizeToFit];
         }
-            
-        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_left"];
+
+        UIImage *bImage = [UIImage imageNamed:@"bubble_left"];
+        UIEdgeInsets edgeInsets = UIEdgeInsetsMake(bImage.size.height/2-1, bImage.size.width/2-1, bImage.size.height/2+1, bImage.size.width/2+1);
+        UIImage *backgroundImage = [bImage resizableImageWithCapInsets:edgeInsets];
+//        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_left"];
         if (!self.messageBackground)
             self.messageBackground  = [[UIImageView alloc] init];
         self.messageBackground.image = backgroundImage;
@@ -615,9 +645,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = NSLocalizedString(@"上午", nil);
+                timeHint = NSLocalizedString(@"AM", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = NSLocalizedString(@"下午", nil);
+                timeHint = NSLocalizedString(@"PM", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -644,7 +674,10 @@ profileImageUrlString:(NSString *)profileImageUrlString
         frame.origin.x = 0;
         self.messageTextView.frame = frame;
         
-        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_right"];
+        UIImage *bImage = [UIImage imageNamed:@"bubble_right"];
+        UIEdgeInsets edgeInsets = UIEdgeInsetsMake(bImage.size.height/2, bImage.size.width/2, bImage.size.height/2, bImage.size.width/2);
+        UIImage *backgroundImage = [bImage resizableImageWithCapInsets:edgeInsets];
+        //        UIImage *backgroundImage = [UIImage imageNamed:@"bubble_right"];
         self.messageBackground.image = backgroundImage;
         frame = self.messageBackground.frame;
         
@@ -708,9 +741,9 @@ profileImageUrlString:(NSString *)profileImageUrlString
             NSString *timeHint = [dateFormatter stringFromDate:updatetimestamp];
             
             if ([timeHint isEqualToString:@"AM"])
-                timeHint = NSLocalizedString(@"上午", nil);
+                timeHint = NSLocalizedString(@"AM", nil);
             else if ([timeHint isEqualToString:@"PM"])
-                timeHint = NSLocalizedString(@"下午", nil);
+                timeHint = NSLocalizedString(@"PM", nil);
             
             [dateFormatter setDateFormat:@"hh:mm"];
             NSString *timestamp = [dateFormatter stringFromDate:updatetimestamp];
@@ -725,7 +758,7 @@ profileImageUrlString:(NSString *)profileImageUrlString
         
         if (!self.readAckLabel) {
             self.readAckLabel = [[UILabel alloc] init];
-            self.readAckLabel.text = NSLocalizedString(@"已讀", nil);
+            self.readAckLabel.text = NSLocalizedString(@"read", nil);
             self.readAckLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:20.0f/2];
             self.readAckLabel.textColor = [HXAppUtility hexToColor:0x999999 alpha:1];
             self.readAckLabel.numberOfLines = 1;
@@ -859,6 +892,14 @@ profileImageUrlString:(NSString *)profileImageUrlString
 - (void)removeSendingArrow
 {
     [self.sendingArrow removeFromSuperview];
+}
+
+
+- (void)chatphotoTapped
+{
+    if (self.delegate) {
+        [self.delegate userPhotoImageTapped:_tappedTag];
+    }
 }
 
 @end

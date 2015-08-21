@@ -10,5 +10,7 @@
 #import "HXChat.h"
 
 @interface HXChatViewController : UIViewController
+
 - (id)initWithChatInfo:(HXChat *)chatInfo setTopicMode:(BOOL)isTopicMode;
+- (id)initInGroupModeWithChatInfo:(HXChat *)chatInfo setRoomInfo:(NSDictionary*)roomdic;
 @end

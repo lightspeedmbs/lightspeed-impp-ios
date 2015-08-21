@@ -13,6 +13,10 @@
 #import "UIView+Toast.h"
 #import "UserUtil.h"
 #import "UIColor+CustomColor.h"
+#import "NotificationCenterUtil.h"
+#import "HXIMManager.h"
+#import "AnPush.h"
+#import "LightspeedCredentials.h"
 
 #define SCREEN_WIDTH self.view.frame.size.width
 #define SCREEN_HEIGHT self.view.frame.size.height
@@ -28,13 +32,13 @@
     [super viewDidLoad];
     [self initView];
     
-    dispatch_queue_t myBackgroundQ = dispatch_queue_create("backgroundDelayQueue", NULL);
-    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 0.2 * NSEC_PER_SEC);
-    dispatch_after(delay, myBackgroundQ, ^(void){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.userNameText becomeFirstResponder];
-        });
-    });
+//    dispatch_queue_t myBackgroundQ = dispatch_queue_create("backgroundDelayQueue", NULL);
+//    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 0.2 * NSEC_PER_SEC);
+//    dispatch_after(delay, myBackgroundQ, ^(void){
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self.userNameText becomeFirstResponder];
+//        });
+//    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -78,7 +82,7 @@
     self.userNameText.keyboardType = UIKeyboardTypeDefault;
     self.userNameText.returnKeyType = UIReturnKeyNext;
     self.userNameText.tintColor = [UIColor color2];
-    self.userNameText.placeholder = NSLocalizedString(@"用戶名稱", nil);
+    self.userNameText.placeholder = NSLocalizedString(@"user_name", nil);
     [textBg addSubview:self.userNameText];
     
     self.passwordText = [[UITextField alloc]initWithFrame:CGRectMake(10,38, textBg.frame.size.width-20, 38)];
@@ -90,14 +94,14 @@
     self.passwordText.backgroundColor = [UIColor clearColor];
     self.passwordText.returnKeyType = UIReturnKeyDone;
     self.passwordText.tintColor = [UIColor color2];
-    self.passwordText.placeholder = NSLocalizedString(@"密碼", nil);
+    self.passwordText.placeholder = NSLocalizedString(@"password", nil);
     [textBg addSubview:self.passwordText];
     
     CGFloat bWidth = (SCREEN_WIDTH - 60 - 6)/2;
     /* signup button */
     UIButton* signUpButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [signUpButton addTarget:self action:@selector(signUpButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [signUpButton setTitle:NSLocalizedString(@"註冊", nil) forState:UIControlStateNormal];
+    [signUpButton setTitle:NSLocalizedString(@"sign-up", nil) forState:UIControlStateNormal];
     [signUpButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
     [signUpButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     signUpButton.titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -110,7 +114,7 @@
     /* login button */
     UIButton* loginButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [loginButton addTarget:self action:@selector(loginButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [loginButton setTitle:NSLocalizedString(@"登入", nil) forState:UIControlStateNormal];
+    [loginButton setTitle:NSLocalizedString(@"login", nil) forState:UIControlStateNormal];
     [loginButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
     [loginButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     loginButton.titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -162,11 +166,10 @@
             dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 1.0f * NSEC_PER_SEC);
             dispatch_after(delay, myBackgroundQ, ^(void){
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
-                                                                             bundle: nil];
-                    UITabBarController *tbVc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
+
+                    [[NSNotificationCenter defaultCenter]postNotificationName:@"loggedIn" object:nil];
                     [self dismissViewControllerAnimated:YES completion:nil];
-                    [UIApplication sharedApplication].keyWindow.rootViewController = tbVc;
+
                 });
             });
         });
@@ -233,11 +236,10 @@
             dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 1.0f * NSEC_PER_SEC);
             dispatch_after(delay, myBackgroundQ, ^(void){
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
-                                                                             bundle: nil];
-                    UITabBarController *tbVc = [mainStoryboard instantiateViewControllerWithIdentifier:@"HXTabBarViewController"];
+
+                    [[NSNotificationCenter defaultCenter]postNotificationName:@"loggedIn" object:nil];
                     [self dismissViewControllerAnimated:YES completion:nil];
-                    [UIApplication sharedApplication].keyWindow.rootViewController = tbVc;
+
                 });
             });
         });
@@ -304,7 +306,7 @@
     NSString *testedAccountName = [[self.userNameText.text componentsSeparatedByCharactersInSet:validCharSet] componentsJoinedByString:@""];
     
     if (![testedAccountName isEqualToString:self.userNameText.text]) {
-        NSString *error = NSLocalizedString(@"您的用戶名稱必須是大小寫的英文字母", nil);
+        NSString *error = NSLocalizedString(@"alphanumeric_characters_only", nil);
         [errorMessages addObject:error];
     }
     

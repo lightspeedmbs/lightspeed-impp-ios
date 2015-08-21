@@ -53,14 +53,14 @@
     self.imageView.clipsToBounds = YES;
     self.imageView.layer.masksToBounds = YES;
     
-    self.rejectButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"拒絕", nil) titleColor:[UIColor redColor] backgroundColor:[UIColor color5]];
+    self.rejectButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"decline", nil) titleColor:[UIColor redColor] backgroundColor:[UIColor color5]];
     frame = self.rejectButton.frame;
     frame.origin = CGPointMake(SCREEN_WIDTH - frame.size.width - 15, self.center.y - frame.size.height/2);
     self.rejectButton.frame = frame;
     [self.rejectButton addTarget:self action:@selector(rejectButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.rejectButton];
     
-    self.approveButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"接受", nil) titleColor:[UIColor color3] backgroundColor:[UIColor color5]];
+    self.approveButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"Accept", nil) titleColor:[UIColor color3] backgroundColor:[UIColor color5]];
     frame = self.approveButton.frame;
     frame.origin = CGPointMake(self.rejectButton.frame.origin.x - frame.size.width - 6, self.center.y - frame.size.height/2);
     self.approveButton.frame = frame;
@@ -103,9 +103,9 @@
     if ([status isEqualToString:@"pending"]) {
         [self showButton];
     }else if([status isEqualToString:@"approved"]){
-        [self showStatusLabelWithTitle:NSLocalizedString(@"已接受", nil)];
+        [self showStatusLabelWithTitle:NSLocalizedString(@"Accepted", nil)];
     }else{
-        [self showStatusLabelWithTitle:NSLocalizedString(@"已拒絕", nil)];
+        [self showStatusLabelWithTitle:NSLocalizedString(@"Declined", nil)];
     }
 }
 
@@ -130,7 +130,7 @@
     self.approveButton.hidden = YES;
     self.rejectButton.hidden = YES;
     self.statusLabel.hidden = NO;
-    self.statusLabel.text = NSLocalizedString(@"已接受", nil);
+    self.statusLabel.text = NSLocalizedString(@"Accepted", nil);
     
     if (self.delegate) {
         [self.delegate didApproveButtonTappedWithRequestId:self.userInfo[@"requestId"]
@@ -145,7 +145,7 @@
     self.approveButton.hidden = YES;
     self.rejectButton.hidden = YES;
     self.statusLabel.hidden = NO;
-    self.statusLabel.text = NSLocalizedString(@"已拒絕", nil);
+    self.statusLabel.text = NSLocalizedString(@"Declined", nil);
     
     if (self.delegate) {
         [self.delegate didRejectButtonTappedWithRequestId:self.userInfo[@"requestId"]];

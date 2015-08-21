@@ -15,6 +15,8 @@
 #import "HXRoundButton.h"
 #import "AnLive.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import <AVFoundation/AVAudioSession.h>
+#import <AVFoundation/AVFoundation.h>
 
 @interface HXAnLiveViewController () <HXIMManagerLiveChatDelegate>
 @property (strong, nonatomic) UIView *targetStreamView;
@@ -62,28 +64,28 @@
         
         if (anLiveMode == AnLiveVideoCall && anLiveRole == AnLiveReciever) {
             self.threeButtonBg.hidden = YES;
-            [self.rightButton updateTitle:NSLocalizedString(@"接聽", nil) backgroundColor:[HXAppUtility hexToColor:0x8fc31f alpha:1]];
-            [self.leftButton updateTitle:NSLocalizedString(@"拒絕", nil) backgroundColor:[UIColor redColor]];
-            self.statusLabel.text = NSLocalizedString(@"視訊通話來電中...", nil);
+            [self.rightButton updateTitle:NSLocalizedString(@"accept_call", nil) backgroundColor:[HXAppUtility hexToColor:0x8fc31f alpha:1]];
+            [self.leftButton updateTitle:NSLocalizedString(@"decline", nil) backgroundColor:[UIColor redColor]];
+            self.statusLabel.text = NSLocalizedString(@"incoming_video_call...", nil);
         }
         
         if (anLiveMode == AnLiveVideoCall && anLiveRole == AnLiveCaller) {
             self.twoButtonBg.hidden = YES;
-            self.statusLabel.text = NSLocalizedString(@"正在等待對方接受邀請...", nil);
+            self.statusLabel.text = NSLocalizedString(@"waiting...", nil);
         }
         
         if (anLiveMode == AnLiveAudioCall && anLiveRole == AnLiveReciever) {
             self.threeButtonBg.hidden = YES;
-            [self.rightButton updateTitle:NSLocalizedString(@"接聽", nil) backgroundColor:[HXAppUtility hexToColor:0x8fc31f alpha:1]];
-            [self.leftButton updateTitle:NSLocalizedString(@"拒絕", nil) backgroundColor:[UIColor redColor]];
-            self.statusLabel.text = NSLocalizedString(@"語音通話來電中...", nil);
+            [self.rightButton updateTitle:NSLocalizedString(@"accept_call", nil) backgroundColor:[HXAppUtility hexToColor:0x8fc31f alpha:1]];
+            [self.leftButton updateTitle:NSLocalizedString(@"decline", nil) backgroundColor:[UIColor redColor]];
+            self.statusLabel.text = NSLocalizedString(@"incoming_call...", nil);
         }
         
         if (anLiveMode == AnLiveAudioCall && anLiveRole == AnLiveCaller) {
             self.threeButtonBg.hidden = YES;
-            [self.rightButton updateTitle:NSLocalizedString(@"掛斷", nil) backgroundColor:[UIColor redColor]];
-            [self.leftButton updateTitle:NSLocalizedString(@"靜音", nil) backgroundColor:[UIColor color2]];
-            self.statusLabel.text = NSLocalizedString(@"正在等待對方接受邀請...", nil);
+            [self.rightButton updateTitle:NSLocalizedString(@"end_call", nil) backgroundColor:[UIColor redColor]];
+            [self.leftButton updateTitle:NSLocalizedString(@"mute", nil) backgroundColor:[UIColor color2]];
+            self.statusLabel.text = NSLocalizedString(@"waiting...", nil);
         }
         
     }
@@ -163,7 +165,7 @@
     
     // status label
     self.statusLabel = [UILabel labelWithFrame:CGRectNull
-                                          text:NSLocalizedString(@"正在等待對方接受邀請...", nil)
+                                          text:NSLocalizedString(@"waiting...", nil)
                                  textAlignment:NSTextAlignmentCenter
                                      textColor:[UIColor color5]
                                           font:[UIFont heitiLightWithSize:14]
@@ -198,7 +200,7 @@
     frame.size.height = 36;
     frame.origin.x = 30;
     frame.origin.y = 0;
-    self.muteButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"靜音", nil) titleColor:[UIColor color5] backgroundColor:[UIColor color2] frame:frame];
+    self.muteButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"mute", nil) titleColor:[UIColor color5] backgroundColor:[UIColor color2] frame:frame];
     [self.muteButton addTarget:self action:@selector(muteButtonListener:) forControlEvents:UIControlEventTouchUpInside];
     [self.muteButton addTarget:self action:@selector(buttonDownListener:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
     [self.muteButton addTarget:self action:@selector(buttonUpListener:) forControlEvents:UIControlEventTouchUpOutside | UIControlEventTouchDragExit];
@@ -209,7 +211,7 @@
     frame.size.height = 36;
     frame.origin.x = 6 +self.muteButton.frame.origin.x +self.muteButton.bounds.size.width;
     frame.origin.y = 0;
-    self.noVideoButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"關閉鏡頭", nil) titleColor:[UIColor color5] backgroundColor:[UIColor color2] frame:frame];
+    self.noVideoButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"camera_off", nil) titleColor:[UIColor color5] backgroundColor:[UIColor color2] frame:frame];
     
     [self.noVideoButton addTarget:self action:@selector(noVideoButtonListener:) forControlEvents:UIControlEventTouchUpInside];
     [self.noVideoButton addTarget:self action:@selector(buttonDownListener:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
@@ -221,7 +223,7 @@
     frame.size.height = 36;
     frame.origin.x = 6 +self.noVideoButton.frame.origin.x +self.noVideoButton.bounds.size.width;
     frame.origin.y = 0;
-    self.cancelButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"掛斷", nil) titleColor:[UIColor color5] backgroundColor:[UIColor redColor] frame:frame];
+    self.cancelButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"end_call", nil) titleColor:[UIColor color5] backgroundColor:[UIColor redColor] frame:frame];
     [self.cancelButton addTarget:self action:@selector(cancelButtonListener:) forControlEvents:UIControlEventTouchUpInside];
     [self.cancelButton addTarget:self action:@selector(buttonDownListener:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
     [self.cancelButton addTarget:self action:@selector(buttonUpListener:) forControlEvents:UIControlEventTouchUpOutside | UIControlEventTouchDragExit];
@@ -237,7 +239,7 @@
     frame.size.height = 36;
     frame.origin.x = 30;
     frame.origin.y = 0;
-    self.leftButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"掛斷", nil) titleColor:[UIColor color5] backgroundColor:[UIColor color2] frame:frame];
+    self.leftButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"end_call", nil) titleColor:[UIColor color5] backgroundColor:[UIColor color2] frame:frame];
     
     [self.leftButton addTarget:self action:@selector(leftButtonListener:) forControlEvents:UIControlEventTouchUpInside];
     [self.leftButton addTarget:self action:@selector(buttonDownListener:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
@@ -249,7 +251,7 @@
     frame.size.height = 36;
     frame.origin.x = self.leftButton.frame.origin.x + self.leftButton.frame.size.width + 6;
     frame.origin.y = 0;
-    self.rightButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"靜音", nil) titleColor:[UIColor color5] backgroundColor:[UIColor redColor] frame:frame];
+    self.rightButton = [[HXRoundButton alloc]initWithTitle:NSLocalizedString(@"mute", nil) titleColor:[UIColor color5] backgroundColor:[UIColor redColor] frame:frame];
     
     [self.rightButton addTarget:self action:@selector(rightButtonListener:) forControlEvents:UIControlEventTouchUpInside];
     [self.rightButton addTarget:self action:@selector(buttonDownListener:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
@@ -297,6 +299,7 @@
 - (void)remotePartyConnected:(NSString*)partyId
 {
     NSLog(@"Remote party connected!");
+    [self setUseSpeaker:YES];
     
     if (self.anLiveMode == AnLiveVideoCall) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -304,11 +307,11 @@
             frame = self.labelBg.frame;
             frame.origin.y = self.view.frame.size.height *.08;
             self.labelBg.frame = frame;
-            self.statusLabel.text = NSLocalizedString(@"視訊通話進行中...", nil);
+            self.statusLabel.text = NSLocalizedString(@"video_call_in_progress...", nil);
         });
     }else{
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.statusLabel.text = NSLocalizedString(@"語音通話進行中...", nil);
+            self.statusLabel.text = NSLocalizedString(@"call_in_progress...", nil);
         });
         
     }
@@ -317,7 +320,10 @@
 - (void)remotePartyDisconnected:(NSString*)partyId
 {
     NSLog(@"Remote party disconnected!");
+    
     [[AnLive shared] hangup];
+    
+    [self setUseSpeaker:NO];
     
     [self dismissViewControllerAnimated:YES completion:nil];
 
@@ -350,8 +356,35 @@
 - (void)error:(NSString*)partyId exception:(ArrownockException*)exception
 {
     NSLog(@"AnLive Error: %@", exception.description);
-
+    [self setUseSpeaker:NO];
 }
+
+#pragma mark - Audio output settings
+- (void) setUseSpeaker:(BOOL)use{
+    AVAudioSession* session = [AVAudioSession sharedInstance];
+    
+    BOOL success;
+    NSError* error;
+    success = [session setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+    if (!success)  NSLog(@"AVAudioSession error setting category:%@",error);
+    
+    UInt32 doChangeDefaultRoute;
+    if(use)
+    {
+        doChangeDefaultRoute = kAudioSessionProperty_OverrideCategoryDefaultToSpeaker;
+        
+    }
+    else
+    {
+        doChangeDefaultRoute = kAudioSessionOverrideAudioRoute_None;
+    }
+    AudioSessionSetProperty (
+                             kAudioSessionProperty_OverrideCategoryDefaultToSpeaker,
+                             sizeof (doChangeDefaultRoute),
+                             &doChangeDefaultRoute
+                             );
+}
+
 
 #pragma mark - Button Listener
 
@@ -362,9 +395,9 @@
     
     
     if (_audioState) {
-        [self.muteButton setTitle:NSLocalizedString(@"取消靜音", nil) forState:UIControlStateNormal];
+        [self.muteButton setTitle:NSLocalizedString(@"unmute", nil) forState:UIControlStateNormal];
     }else
-        [self.muteButton setTitle:NSLocalizedString(@"靜音", nil) forState:UIControlStateNormal];
+        [self.muteButton setTitle:NSLocalizedString(@"mute", nil) forState:UIControlStateNormal];
     
     [[AnLive shared] setAudioState:!_audioState];
     _audioState = !_audioState;
@@ -379,9 +412,9 @@
     _videoState = !_videoState;
     
     if (_videoState) {
-        [self.noVideoButton setTitle:NSLocalizedString(@"關閉鏡頭", nil) forState:UIControlStateNormal];
+        [self.noVideoButton setTitle:NSLocalizedString(@"camera_off", nil) forState:UIControlStateNormal];
     }else
-        [self.noVideoButton setTitle:NSLocalizedString(@"開啟鏡頭", nil) forState:UIControlStateNormal];
+        [self.noVideoButton setTitle:NSLocalizedString(@"camera_on", nil) forState:UIControlStateNormal];
     
 }
 
@@ -391,13 +424,14 @@
     self.noVideoButton.userInteractionEnabled = YES;
     
     [[AnLive shared] hangup];
+    [self setUseSpeaker:NO];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)rightButtonListener:(UIButton *)button
 {
     self.leftButton.userInteractionEnabled = YES;
-    if ([button.titleLabel.text isEqualToString:NSLocalizedString(@"接聽", nil)]) {
+    if ([button.titleLabel.text isEqualToString:NSLocalizedString(@"accept_call", nil)]) {
         
         [[AnLive shared] answer:YES];
         
@@ -408,19 +442,19 @@
             frame = self.labelBg.frame;
             frame.origin.y = self.view.frame.size.height *.08;
             self.labelBg.frame = frame;
-            self.statusLabel.text = NSLocalizedString(@"視訊通話進行中...", nil);
+            self.statusLabel.text = NSLocalizedString(@"video_call_in_progress...", nil);
         }else{
             self.threeButtonBg.hidden = YES;
-            [self.rightButton updateTitle:NSLocalizedString(@"掛斷", nil) backgroundColor:[UIColor redColor]];
-            [self.leftButton updateTitle:NSLocalizedString(@"靜音", nil) backgroundColor:[UIColor color2]];
-            self.statusLabel.text = NSLocalizedString(@"語音通話進行中...", nil);
+            [self.rightButton updateTitle:NSLocalizedString(@"end_call", nil) backgroundColor:[UIColor redColor]];
+            [self.leftButton updateTitle:NSLocalizedString(@"mute", nil) backgroundColor:[UIColor color2]];
+            self.statusLabel.text = NSLocalizedString(@"call_in_progress...", nil);
         }
         
     }
-    else if([button.titleLabel.text isEqualToString:NSLocalizedString(@"拒絕", nil)] || [button.titleLabel.text isEqualToString:NSLocalizedString(@"掛斷", nil)])
+    else if([button.titleLabel.text isEqualToString:NSLocalizedString(@"decline", nil)] || [button.titleLabel.text isEqualToString:NSLocalizedString(@"end_call", nil)])
     {
        [[AnLive shared] hangup];
-       [self dismissViewControllerAnimated:YES completion:nil]; 
+       [self dismissViewControllerAnimated:YES completion:nil];
     }
     
 }
@@ -428,22 +462,22 @@
 - (void)leftButtonListener:(UIButton *)button
 {
     self.rightButton.userInteractionEnabled = YES;
-    if([button.titleLabel.text isEqualToString:NSLocalizedString(@"拒絕", nil)] || [button.titleLabel.text isEqualToString:NSLocalizedString(@"掛斷", nil)])
+    if([button.titleLabel.text isEqualToString:NSLocalizedString(@"decline", nil)] || [button.titleLabel.text isEqualToString:NSLocalizedString(@"end_call", nil)])
     {
         [[AnLive shared] hangup];
         [self dismissViewControllerAnimated:YES completion:nil];
     }
-    else if([button.titleLabel.text isEqualToString:NSLocalizedString(@"靜音", nil)])
+    else if([button.titleLabel.text isEqualToString:NSLocalizedString(@"mute", nil)])
     {
         [[AnLive shared] setAudioState:!_audioState];
         _audioState = !_audioState;
-        [self.leftButton updateTitle:NSLocalizedString(@"取消靜音", nil) backgroundColor:[UIColor color2]];
+        [self.leftButton updateTitle:NSLocalizedString(@"unmute", nil) backgroundColor:[UIColor color2]];
     }
-    else if([button.titleLabel.text isEqualToString:NSLocalizedString(@"取消靜音", nil)])
+    else if([button.titleLabel.text isEqualToString:NSLocalizedString(@"unmute", nil)])
     {
         [[AnLive shared] setAudioState:!_audioState];
         _audioState = !_audioState;
-        [self.leftButton updateTitle:NSLocalizedString(@"靜音", nil) backgroundColor:[UIColor color2]];
+        [self.leftButton updateTitle:NSLocalizedString(@"mute", nil) backgroundColor:[UIColor color2]];
     }
     
 }

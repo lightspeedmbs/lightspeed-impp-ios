@@ -48,7 +48,7 @@
 
 -(void)viewWillLayoutSubviews{
     self.navigationController.navigationBar.backItem.backBarButtonItem
-    =[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"返回", nil)
+    =[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil)
                                       style:UIBarButtonItemStylePlain
                                      target:self
                                      action:nil];
@@ -83,7 +83,7 @@
     [self.searchBar setShowsCancelButton:NO];
     self.searchBar.delegate = self;
     self.searchBar.tintColor = [UIColor color11];
-    self.searchBar.placeholder = NSLocalizedString(@"請輸入好友名稱並按下搜尋", nil);
+    self.searchBar.placeholder = NSLocalizedString(@"search_by_name", nil);
     [self.view addSubview:self.searchBar];
     
     /* tableView */
@@ -100,7 +100,7 @@
 
 - (void)initNavigationBar
 {
-    [HXAppUtility initNavigationTitle:NSLocalizedString(@"加入新好友", nil) barTintColor:[UIColor color1] withViewController:self];
+    [HXAppUtility initNavigationTitle:NSLocalizedString(@"add_friend", nil) barTintColor:[UIColor color1] withViewController:self];
 }
 
 #pragma mark - Table view delegate method
@@ -141,15 +141,15 @@
     
     if ([UserUtil checkFriendRelationshipWithCliendId:user.clientId]) {
         
-        [cell showLabelWithTitle:NSLocalizedString(@"已是好友", nil)];
+        [cell showLabelWithTitle:NSLocalizedString(@"already_friends", nil)];
         
     }else if ([UserUtil checkFollowRelationshipWithCliendId:user.clientId]){
         
-        [cell updateTitle:NSLocalizedString(@"已送邀請", nil) TitleColor:[UIColor color1]];
+        [cell updateTitle:NSLocalizedString(@"sent", nil) TitleColor:[UIColor color1]];
         [cell setButtonDisable];
         
     }else{
-        [cell updateTitle:NSLocalizedString(@"加入好友", nil) TitleColor:[UIColor color3]];
+        [cell updateTitle:NSLocalizedString(@"Add", nil) TitleColor:[UIColor color3]];
     }
     
     return cell;
@@ -166,7 +166,7 @@
 {
     HXUser *user = self.usersArray[sender.tag];
     HXCustomButton *button = (HXCustomButton *)sender;
-    [button updateTitle:NSLocalizedString(@"已送邀請", nil) TitleColor:[UIColor color1]];
+    [button updateTitle:NSLocalizedString(@"sent", nil) TitleColor:[UIColor color1]];
     button.enabled = NO;
     NSDictionary *params = @{@"user_id":[HXUserAccountManager manager].userId,
                              @"target_user_id":user.userId};
@@ -189,7 +189,7 @@
         [UserUtil updatedUserFollowsWithCurrentUser:[HXUserAccountManager manager].userInfo targetUser:user];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.view makeImppToast:NSLocalizedString(@"發送好友請求成功", nil) navigationBarHeight:64];
+            [self.view makeImppToast:NSLocalizedString(@"sent_friend_request", nil) navigationBarHeight:64];
         });
     } failure:^(NSDictionary* response){
         
@@ -199,8 +199,18 @@
     [[HXIMManager manager] sendFriendRequestMessageWithClientId:user.clientId targetUserName:user.userName];
     
 }
+#pragma mark - UISearchBar Delegate
 
-#pragma mark - UISearchBarDelegate
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+{
+    self.searchBar.placeholder = NSLocalizedString(@"Please Enter Friends Name", nil);
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
+{
+    self.searchBar.placeholder = NSLocalizedString(@"search_by_name", nil);
+}
+
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
     [searchBar resignFirstResponder];

@@ -18,7 +18,9 @@
 #import "NotificationCenterUtil.h"
 #import "ChatUtil.h"
 #import "UserUtil.h"
+#import "AnRoomUtil.h"
 #import "HXUser+Additions.h"
+#import "HXAnRoom+Additions.h"
 #import "HXMessageTableViewCell.h"
 #import "UIColor+CustomColor.h"
 #import "HXAnLiveViewController.h"
@@ -27,10 +29,12 @@
 #import "HXImageDetailViewController.h"
 #import "HXLoadingView.h"
 #import "HXAnSocialManager.h"
+#import "HXUserAccountManager.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <CoreData/CoreData.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import "HXFriendProfileViewController.h"
 
 #define NAV_BAR_HEIGHT 0
 #define IS_OS_8_OR_LATER    ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
@@ -52,7 +56,9 @@
 @property (strong, nonatomic) UIButton *backButton;
 @property (strong, nonatomic) UITextField * alertTextField;
 @property (strong, nonatomic) NSString *currentUserName;
+@property (strong, nonatomic) NSDictionary *roomInfo;
 @property BOOL isTopicMode;
+@property BOOL isAnRoomMode;
 @property CGFloat keyboardHeight;
 @end
 
@@ -61,8 +67,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _keyboardHeight = 0;
-    [self fetchChatHistory];
-
+    
+    
+    
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
@@ -95,6 +103,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didFinishVideoAudioCall:)
                                                  name:FinishVideoAudioCall object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateUserPhoto)
+                                                 name:DidUserUpdated object:nil];
+    
     
 }
 
@@ -105,18 +117,47 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [self fetchChatHistory];
     [self initNavigationBar];
     [HXIMManager manager].chatDelegate = self;
     [HXIMManager manager].topicDelegate = self;
     
     
     if (self.isTopicMode) {
-        [[[HXIMManager manager]anIM] addClients:[NSSet setWithObject:[HXIMManager manager].clientId] toTopicId:self.chatInfo.topicId];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[HXIMManager manager].anIM addClients:[NSSet setWithObject:[HXIMManager manager].clientId] toTopicId:self.chatInfo.topicId isNeedNotice:NO currentClientId:[HXIMManager manager].clientId success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+                NSLog(@"AnIM addClients successful");
+            } failure:^(ArrownockException *exception) {
+                NSLog(@"AnIm addClients failed, error : %@", exception.getMessage);
+                if ([exception.getMessage hasSuffix:@"Topic not found."]) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [ChatUtil deleteChatHistory:self.chatInfo];
+                        [UserUtil removeTopic:self.chatInfo from:[HXIMManager manager].clientId];
+                        [ChatUtil deleteChat:self.chatInfo];
+                        [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
+                        [[NSNotificationCenter defaultCenter]postNotificationName:RefreshChatHistory object:nil];
+                        
+                        [self.navigationController popViewControllerAnimated:YES];
+                    });
+                }
+            }];
+        });
+        
+        
+        
+        
+//        [[[HXIMManager manager]anIM] addClients:[NSSet setWithObject:[HXIMManager manager].clientId] toTopicId:self.chatInfo.topicId success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+//            NSLog(@"AnIM addClients successful");
+//        } failure:^(ArrownockException *exception) {
+//            NSLog(@"AnIm addClients failed, error : %@", exception.getMessage);
+//        }];
     }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    
     [self.composeView resignFirstResponder];
 }
 
@@ -132,13 +173,32 @@
     if (self)
     {
         self.hidesBottomBarWhenPushed = YES;
+        self.isAnRoomMode = NO;
         self.chatInfo = chatInfo;
+//        NSLog(@"%@",chatInfo.toDict);
+        if ([chatInfo.toDict[@"isAnRoomChat"] isEqualToString:@"_ANROOM_"]) {
+            HXAnRoom *room = [AnRoomUtil getRoomByTopicId:self.chatInfo.topicId];
+            _roomInfo = room.toDict;
+            _isAnRoomMode = YES;
+            
+            for (NSString *userid in room.users) {
+                HXUser *newuser = [UserUtil getHXUserByUserId:userid];
+                if (newuser) {
+                    if (![chatInfo.users containsObject:newuser] ) {
+                        [chatInfo addUsersObject:newuser];
+                    }
+                }
+                
+            }
+
+        }
         self.isTopicMode = isTopicMode;
         self.messagesArray = [[NSMutableArray alloc] initWithCapacity:0];
         self.sendingMsgSet = [[NSMutableSet alloc] initWithCapacity:0];
         self.readMsgSet = [[NSMutableSet alloc] initWithCapacity:0];
         if (!isTopicMode) {
             self.targetClientId = self.chatInfo.targetClientId;
+            self.targetUser = [UserUtil getHXUserByClientId:self.chatInfo.targetClientId];
         }else {
             self.targetTopicId = self.chatInfo.topicId;
         }
@@ -149,6 +209,41 @@
     return self;
 }
 
+- (id)initInGroupModeWithChatInfo:(HXChat *)chatInfo setRoomInfo:(NSDictionary*)roomdic
+{
+    self = [super init];
+    if (self)
+    {
+        self.hidesBottomBarWhenPushed = YES;
+        self.chatInfo = chatInfo;
+        HXAnRoom *room = [AnRoomUtil getRoomByTopicId:self.chatInfo.topicId];
+        _roomInfo = room.toDict;
+        self.isAnRoomMode = YES;
+        
+        for (NSString *userid in room.users) {
+            HXUser *newuser = [UserUtil getHXUserByUserId:userid];
+            if (newuser) {
+                if (![chatInfo.users containsObject:newuser] ) {
+                    [chatInfo addUsersObject:newuser];
+                }
+            }
+            
+        }
+        //[MessageUtil updatedTopicSessionWithUsers:self.chatInfo.users topicId:self.chatInfo.topicId topicName:self.chatInfo.topicName topicOwner:nil];
+        
+        self.isTopicMode = YES;
+        self.messagesArray = [[NSMutableArray alloc] initWithCapacity:0];
+        self.sendingMsgSet = [[NSMutableSet alloc] initWithCapacity:0];
+        self.readMsgSet = [[NSMutableSet alloc] initWithCapacity:0];
+        self.targetTopicId = chatInfo.topicId;
+        self.currentUserName = [UserUtil getHXUserByClientId:[HXIMManager manager].clientId].userName;
+        [self initView];
+        [self initNavigationBar];
+    }
+    return self;
+}
+
+
 - (void)initView
 {
     CGRect frame;
@@ -158,12 +253,14 @@
     self.composeView = [[HXComposeView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 44)];
     self.composeView.delegate = self;
     frame = self.composeView.frame;
-    frame.origin.y = self.view.frame.size.height -frame.size.height -64;
+    //frame.origin.y = self.view.frame.size.height -frame.size.height -64;
+    frame.origin.y = [[UIScreen mainScreen]bounds].size.height -frame.size.height -64;
     self.composeView.frame = frame;
     self.composeView.isTopicMode = self.isTopicMode;
     [self.view addSubview:self.composeView];
     
-    frame = self.view.frame;
+    frame = [[UIScreen mainScreen]bounds];
+    //frame = self.view.frame;
     frame.origin.y = 0;
     frame.size.height -= self.composeView.frame.size.height +64;
     self.tableView = [[UITableView alloc] initWithFrame:frame
@@ -183,22 +280,34 @@
 
 - (void)initNavigationBar
 {
-    NSString *title = self.isTopicMode ? [NSString stringWithFormat:@"%@(%d)",self.chatInfo.topicName,(int)self.chatInfo.users.count+1] : self.chatInfo.targetUserName;
+    NSString *title;
+    
+//    if (_isAnRoomMode) {
+//        int roomUserCount = (int)[NSArray arrayWithArray:self.roomInfo[@"users"]].count;
+//        title = [NSString stringWithFormat:@"%@(%d)",self.chatInfo.topicName,roomUserCount];
+//    }else{
+        title = self.isTopicMode ? [NSString stringWithFormat:@"%@(%d)",self.chatInfo.topicName,(int)self.chatInfo.users.count] : self.chatInfo.targetUserName;
+    //}
+    
     [HXAppUtility initNavigationTitle:title
                          barTintColor:[UIColor color1]
                    withViewController:self];
     
     if (self.isTopicMode == YES) {
-        UIButton *editButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [editButton addTarget:self action:@selector(editButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-        [editButton setTitle:NSLocalizedString(@"編輯", nil) forState:UIControlStateNormal];
-        [editButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [editButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
-        editButton.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:34/2];
-        [editButton sizeToFit];
-        UIBarButtonItem *editBarButton = [[UIBarButtonItem alloc] initWithCustomView:editButton];
-        [self.navigationItem setRightBarButtonItem:editBarButton];
+        if (!self.isAnRoomMode) {
+            UIButton *editButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [editButton addTarget:self action:@selector(editButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+            [editButton setTitle:NSLocalizedString(@"edit", nil) forState:UIControlStateNormal];
+            [editButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [editButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
+            editButton.titleLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:34/2];
+            [editButton sizeToFit];
+            UIBarButtonItem *editBarButton = [[UIBarButtonItem alloc] initWithCustomView:editButton];
+            [self.navigationItem setRightBarButtonItem:editBarButton];
+        }
+        
     }
+    
 }
 
 - (void)initLocationManager
@@ -219,9 +328,9 @@
 
 #pragma mark - Listener
 
-- (void)backBarButtonTapped
+- (void)backButtonTapped
 {
-    [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)tableViewTapped
@@ -233,15 +342,15 @@
 {
     [self.composeView textFieldResignFirstResponder];
     
-    NSString *button1 = NSLocalizedString(@"編輯群組名稱", nil);
-    NSString *button2 = NSLocalizedString(@"邀請成員", nil);
-    NSString *button3 = NSLocalizedString(@"退出群組", nil);
+    NSString *button1 = NSLocalizedString(@"edit_group_name", nil);
+    NSString *button2 = NSLocalizedString(@"invite_others", nil);
+    NSString *button3 = NSLocalizedString(@"leave_group", nil);
     
     if (self.chatInfo.topicOwner && [self.chatInfo.topicOwner.clientId isEqualToString:[HXIMManager manager].clientId]) {
-       button3 = NSLocalizedString(@"刪除並解散群組", nil);
+        button3 = NSLocalizedString(@"delete_group", nil);
     }
     
-    NSString *cancelTitle = NSLocalizedString(@"取消", nil);
+    NSString *cancelTitle = NSLocalizedString(@"Cancel", nil);
     UIActionSheet *actionSheet = [[UIActionSheet alloc]
                                   initWithTitle:nil
                                   delegate:self
@@ -258,11 +367,11 @@
     
     switch (buttonIndex) {
         case 0: {
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"編輯群組名稱", nil)
-                                                             message:NSLocalizedString(@"請輸入這個群組的名稱", nil)
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"edit_group_name", nil)
+                                                             message:NSLocalizedString(@"enter_group_name", nil)
                                                             delegate:self
-                                                   cancelButtonTitle:NSLocalizedString(@"取消", nil)
-                                                   otherButtonTitles:NSLocalizedString(@"儲存", nil),nil];
+                                                   cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                                   otherButtonTitles:NSLocalizedString(@"save", nil),nil];
             alert.alertViewStyle = UIAlertViewStylePlainTextInput;
             self.alertTextField = [alert textFieldAtIndex:0];
             [alert show];
@@ -279,13 +388,43 @@
             NSString *clientId = [HXIMManager manager].clientId;
             
             if (self.chatInfo.topicOwner && [self.chatInfo.topicOwner.clientId isEqualToString:[HXIMManager manager].clientId]) {
-                [[[HXIMManager manager]anIM] removeTopic:self.targetTopicId];
-                [UserUtil removeTopic:self.chatInfo from:clientId];
-                [ChatUtil deleteChat:self.chatInfo];
+                
+                
+                [[[HXIMManager manager]anIM] removeTopic:self.targetTopicId success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+                    NSLog(@"AnIM removeTopic successful");
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [UserUtil removeTopic:self.chatInfo from:clientId];
+                        [ChatUtil deleteChat:self.chatInfo];
+                        [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
+                        [[NSNotificationCenter defaultCenter]postNotificationName:RefreshChatHistory object:nil];
+                        
+                    });
+                   
+                } failure:^(ArrownockException *exception) {
+                    NSLog(@"AnIm removeTopic failed, error : %@", exception.getMessage);
+//                    [[[HXIMManager manager]anIM] removeTopic:self.targetTopicId];
+//                    [UserUtil removeTopic:self.chatInfo from:clientId];
+//                    [ChatUtil deleteChat:self.chatInfo];
+//                    [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
+                }];
+                
+                
             }else{
-                [[[HXIMManager manager]anIM] removeClients:[NSSet setWithObject:clientId] fromTopicId:self.targetTopicId];
-                [ChatUtil deleteChatHistory:self.chatInfo];
-                [UserUtil removeTopic:self.chatInfo from:clientId];
+                [[[HXIMManager manager]anIM] removeClients:[NSSet setWithObject:clientId] fromTopicId:self.targetTopicId success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+                    NSLog(@"AnIM removeClients successful");
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [ChatUtil deleteChatHistory:self.chatInfo];
+                        [UserUtil removeTopic:self.chatInfo from:clientId];
+                        [ChatUtil deleteChat:self.chatInfo];
+                        [[NSNotificationCenter defaultCenter]postNotificationName:RefreshFriendList object:nil];
+                        [[NSNotificationCenter defaultCenter]postNotificationName:RefreshChatHistory object:nil];
+                        
+                    });
+                    
+                } failure:^(ArrownockException *exception) {
+                    NSLog(@"AnIm removeClients failed, error : %@", exception.getMessage);
+                }];
+                
             }
             
             [self.navigationController popViewControllerAnimated:YES];
@@ -313,9 +452,12 @@
             NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
         }
         if (self.chatInfo.topicOwner) {
-            [[[HXIMManager manager]anIM] updateTopic:self.chatInfo.topicId withName:self.alertTextField.text withOwner:self.chatInfo.topicOwner.clientId];
+            [[[HXIMManager manager]anIM] updateTopic:self.chatInfo.topicId withName:self.alertTextField.text withOwner:self.chatInfo.topicOwner.clientId success:^(NSString *topicId, NSNumber *createdTimestamp, NSNumber *updatedTimestamp) {
+                NSLog(@"AnIM updateTopic successful");
+            } failure:^(ArrownockException *exception) {
+                NSLog(@"AnIm updateTopic failed, error : %@", exception.getMessage);
+            }];
         }
-        
     }
 }
 
@@ -323,7 +465,7 @@
 
 - (void)didSaveMessageToLocal:(NSNotification *)notice
 {
-    [self updateNavigationBarItem:nil];
+    
     
     if (self.isTopicMode) return;
     NSString *msgId = notice.object;
@@ -331,12 +473,12 @@
         [MessageUtil updateMessageReadAckByMessageId:msgId];
         [self.readMsgSet removeObject:msgId];
     }
-    
+    [self updateNavigationBarItem:nil];
 }
 
 - (void)didSaveTopicMessageToLocal:(NSNotification *)notice
 {
-    [self updateNavigationBarItem:nil];
+    
     
     if (!self.isTopicMode) return;
     NSString *msgId = notice.object;
@@ -344,7 +486,7 @@
         [MessageUtil updateMessageReadAckByMessageId:msgId];
         [self.readMsgSet removeObject:msgId];
     }
-    
+    [self updateNavigationBarItem:nil];
 }
 
 #pragma mark - Get Offline Message
@@ -368,21 +510,17 @@
 {
     NSDictionary *dic = notice.object;
     if ([self.targetClientId isEqualToString:dic[@"clientId"]] && [HXIMManager manager].anLiveCallStr) {
+//        if ([[HXIMManager manager].anLiveCallStr isEqualToString:@"視訊通話"]||[[HXIMManager manager].anLiveCallStr isEqualToString:@"Video Call"]||[[HXIMManager manager].anLiveCallStr isEqualToString:@"视频通话"]) {
+//            [self sendMessage:[NSString stringWithFormat:@"[%@%@]",NSLocalizedString(@"video_call", nil),dic[@"duration"]]];
+//        }else{
+//            
+//        }
         [self sendMessage:[NSString stringWithFormat:@"[%@%@]",[HXIMManager manager].anLiveCallStr,dic[@"duration"]]];
         [HXIMManager manager].anLiveCallStr = nil;
     }
 }
 
 #pragma mark - IMManager Delegate
-
-- (void)anIMDidAddClientsWithException:(NSString *)exception
-{
-    if (!exception)
-    {
-        
-        //handle topic mode
-    }
-}
 
 - (void)anIMMessageSent:(NSString *)messageId
 {
@@ -408,11 +546,11 @@
         if (![topicId isEqualToString:@""])
             return;
     }
-
+    
     [self addTimeMessageWithTimestamp:timestamp];
     [self.messagesArray addObject:customMessage];
     
-    if (!self.isTopicMode) {
+    if (!self.isTopicMode && ![@"100000000" isEqualToString:messageId]) {
         [[[HXIMManager manager]anIM] sendReadACK:messageId toClients:[NSSet setWithObject:from]];
     }
     
@@ -420,7 +558,7 @@
     [self.readMsgSet addObject:messageId];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-
+        
         [self.tableView reloadData];
         if (self.messagesArray.count) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messagesArray.count-1 inSection:0];
@@ -454,7 +592,7 @@
     [self.readMsgSet addObject:messageId];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-
+        
         [self.tableView reloadData];
         if (self.messagesArray.count) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messagesArray.count-1 inSection:0];
@@ -481,7 +619,7 @@
             [MessageUtil updateMessageReadAckByMessageId:message.msgId];
             
             if(!self.isTopicMode){
-              [[[HXIMManager manager]anIM] sendReadACK:message.msgId toClients:[NSSet setWithObject:message.from]];
+                [[[HXIMManager manager]anIM] sendReadACK:message.msgId toClients:[NSSet setWithObject:message.from]];
             }
             
         }
@@ -507,13 +645,13 @@
         
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    //dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
         if (self.messagesArray.count) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messagesArray.count-1 inSection:0];
             [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
         }
-    });
+//    });
 }
 
 #pragma mark - TableView Delegate Datasource
@@ -530,12 +668,12 @@
         HXMessage *message = self.messagesArray[indexPath.row];
         NSString *ownerName = [message.from isEqualToString:self.chatInfo.currentClientId]
         ? nil : message.senderName;
-
+        
         return [HXMessageTableViewCell cellHeightForOwnerName:ownerName
                                                       message:message.message
                                                   messageType:message.type
                                                         image:message.content] + 20/2;
-
+        
     }
     return 70;
     
@@ -581,16 +719,24 @@
         HXMessageTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
         
         HXMessage *message = self.messagesArray[indexPath.row];
+        HXUser *localUserData = [UserUtil getHXUserByClientId:message.from];
+        NSString *photoUrl;
         
-        NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"clientId == %@", message.from];
-        NSArray *users = [[[self.chatInfo.users allObjects] filteredArrayUsingPredicate:resultPredicate]mutableCopy];
-        HXUser *remoteUser = [users firstObject];
-        
-        NSString *photoUrl = remoteUser ? remoteUser.photoURL : nil;
+        if (localUserData) {
+            if (![localUserData.userId isEqualToString:[HXUserAccountManager manager].userId]) {
+                photoUrl = localUserData.photoURL;
+
+            }else{
+                photoUrl = nil;
+            }
+            
+        }else{
+            photoUrl = message.senderPhotoUrl;
+        }
         NSString *ownerName = [message.from isEqualToString:self.chatInfo.currentClientId]
         ? nil : message.senderName;
         
-
+        
         // read ack
         if (self.remoteReadMsgSet) {
             if ([self.remoteReadMsgSet count]){
@@ -631,16 +777,16 @@
                                  readACK:[message.readACK integerValue]];
             cell.tappedTag = indexPath.row;
         }
-    
+        
         
         return cell;
     }
-
+    
 }
 
 - (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
 {
-
+    
 }
 
 #pragma mark - HXMessageCell Delegate
@@ -668,6 +814,16 @@
         [self.navigationController pushViewController:mapVc animated:YES];
     }
 }
+
+- (void)userPhotoImageTapped:(NSInteger)index{
+    HXMessage *message = self.messagesArray[index];
+        HXUser * user = [UserUtil getHXUserByUserName:message.senderName];
+        HXFriendProfileViewController *vc = [[HXFriendProfileViewController alloc]initWithUserInfo:user withViewController:self];
+        UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
+        [self presentViewController:nav animated:YES completion:nil];
+        
+}
+
 
 #pragma mark - CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -697,14 +853,16 @@
     if (![[HXAppUtility removeWhitespace:message] length])return;
     
     NSString *msgId;
-    NSString *notificationAlert = [NSString stringWithFormat:@"%@ : %@",self.currentUserName,message];
+    NSString *notificationAlert = [NSString stringWithFormat:@"%@: %@",self.currentUserName,message];
     NSDictionary *customData = @{@"name":self.currentUserName,
-                                 @"notification_alert":notificationAlert};
+                                 @"notification_alert":notificationAlert,
+                                 @"photoUrl":[HXUserAccountManager manager].photoUrl
+                                 };
     if (!self.isTopicMode) {
-        NSSet *clientId = [NSSet setWithObject:self.targetClientId];
+        //NSSet *clientId = [NSSet setWithObject:self.targetClientId];
         msgId = [[[HXIMManager manager]anIM] sendMessage:message
                                               customData:customData
-                                               toClients:clientId
+                                               toClient:self.targetClientId
                                           needReceiveACK:YES];
     }else{
         msgId = [[[HXIMManager manager]anIM] sendMessage:message
@@ -727,7 +885,7 @@
     
     [self wrapMessageToSend:[MessageUtil anIMMessageToHXMessage:customMessage]];
     
-
+    
     if (!self.isTopicMode) {
         [MessageUtil saveChatMessageIntoDB:@[customMessage] withTargetClientId:self.targetClientId];
     }else{
@@ -778,13 +936,13 @@
 
 - (void)shareLocationTapped
 {
-   [self performSelectorOnMainThread:@selector(initLocationManager) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(initLocationManager) withObject:nil waitUntilDone:NO];
 }
 
 - (void)videoCallTapped
 {
     NSLog(@"Ringing ...");
-    [HXIMManager manager].anLiveCallStr = NSLocalizedString(@"視訊通話", nil);
+    [HXIMManager manager].anLiveCallStr = NSLocalizedString(@"video_call", nil);
     
     [[AnLive shared] videoCall:self.targetClientId
                          video:YES
@@ -793,9 +951,9 @@
                            // 视频通话请求建立成功，正在等待对方应答
                            NSLog(@"Waiting for target client to answer the call...");
                            
-                           HXAnLiveViewController *anLiveVC = [[HXAnLiveViewController alloc] initWithClientName:self.chatInfo.targetUserName clientPhotoImageUrl:nil mode:AnLiveVideoCall role:AnLiveCaller];
+                           HXAnLiveViewController *anLiveVC = [[HXAnLiveViewController alloc] initWithClientName:self.chatInfo.targetUserName clientPhotoImageUrl:self.targetUser.photoURL mode:AnLiveVideoCall role:AnLiveCaller];
                            anLiveVC.transitioningDelegate = self;
-                           anLiveVC.modalPresentationStyle = UIModalPresentationCustom;
+                           //anLiveVC.modalPresentationStyle = UIModalPresentationCustom;
                            
                            [self presentViewController:anLiveVC animated:YES completion:nil];
                            
@@ -809,7 +967,7 @@
 
 - (void)audioCallTapped
 {
-    [HXIMManager manager].anLiveCallStr = NSLocalizedString(@"語音通話", nil);
+    [HXIMManager manager].anLiveCallStr = NSLocalizedString(@"call", nil);
     
     [[AnLive shared] voiceCall:self.targetClientId
               notificationData:nil
@@ -818,7 +976,7 @@
                            // 视频通话请求建立成功，正在等待对方应答
                            NSLog(@"Waiting for target client to answer the call...");
                            
-                           HXAnLiveViewController *anLiveVC = [[HXAnLiveViewController alloc] initWithClientName:self.chatInfo.targetUserName clientPhotoImageUrl:nil mode:AnLiveAudioCall role:AnLiveCaller];
+                           HXAnLiveViewController *anLiveVC = [[HXAnLiveViewController alloc] initWithClientName:self.chatInfo.targetUserName clientPhotoImageUrl:self.targetUser.photoURL mode:AnLiveAudioCall role:AnLiveCaller];
                            anLiveVC.transitioningDelegate = self;
                            anLiveVC.modalPresentationStyle = UIModalPresentationCustom;
                            
@@ -846,7 +1004,7 @@
         [self showSendingImage:image];
         
     }
-
+    
 }
 #pragma mark - Navigation Method
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
@@ -854,7 +1012,7 @@
     [viewController.navigationItem setTitle:@""];
     viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor whiteColor];
     viewController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:NSLocalizedString(@"取消", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelBarButtonTapped)];
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelBarButtonTapped)];
     viewController.navigationItem.rightBarButtonItem = cancelButton;
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
 }
@@ -870,17 +1028,19 @@
 {
     float fLat = self.locationManager.location.coordinate.latitude;
     float fLong = self.locationManager.location.coordinate.longitude;
-    NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@ 向您傳送了位置訊息", nil),self.currentUserName];
+    NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@_sent_you_a_location", nil),self.currentUserName];
     NSDictionary *customData = @{@"location":@{@"latitude":[NSNumber numberWithFloat:fLat],
                                                @"longitude":[NSNumber numberWithFloat:fLong]},
                                  @"name":self.currentUserName,
-                                 @"notification_alert":notificationAlert};
+                                 @"notification_alert":notificationAlert,
+                                 @"photoUrl":[HXUserAccountManager manager].photoUrl
+                                 };
     NSString *msgId;
     if (!self.isTopicMode) {
-        NSSet *clientId = [NSSet setWithObject:self.targetClientId];
+        //NSSet *clientId = [NSSet setWithObject:self.targetClientId];
         msgId = [[[HXIMManager manager] anIM] sendMessage:@"[location]"
                                                customData:customData
-                                                toClients:clientId
+                                                toClient:self.targetClientId
                                            needReceiveACK:YES];
     }else{
         msgId = [[[HXIMManager manager] anIM] sendMessage:@"[location]"
@@ -888,7 +1048,7 @@
                                                 toTopicId:self.targetTopicId
                                            needReceiveACK:YES];
     }
-   
+    
     NSNumber *timestamp = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]*1000];
     
     AnIMMessage *customMessage = [[AnIMMessage alloc]initWithType:AnIMTextMessage
@@ -917,11 +1077,11 @@
 {
     [self dismissViewControllerAnimated:YES completion:nil];
     
-   // NSData* originalImageData = UIImageJPEGRepresentation(image, 1);
+    // NSData* originalImageData = UIImageJPEGRepresentation(image, 1);
     UIImage *thumbnail = [HXAppUtility thumbnailImage:image];
     NSData* thumbnailData = UIImageJPEGRepresentation(thumbnail, 1);
     
-    NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@ 向您傳送了圖片", nil),self.currentUserName];
+    NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@_sent_you_an_image", nil),self.currentUserName];
     NSDictionary *customData = @{@"name":self.currentUserName,
                                  @"notification_alert":notificationAlert};
     NSNumber *timestamp = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]*1000];
@@ -967,17 +1127,19 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             
             NSString *msgId;
-            NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@ 向您傳送了圖片", nil),self.currentUserName];
+            NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@_sent_you_an_image", nil),self.currentUserName];
             NSDictionary *customData = @{@"name":self.currentUserName,
                                          @"type":@"image",
                                          @"url":photoUrls,
-                                         @"notification_alert":notificationAlert};
+                                         @"notification_alert":notificationAlert,
+                                         @"photoUrl":[HXUserAccountManager manager].photoUrl
+                                         };
             if (!self.isTopicMode) {
-                NSSet *clientId = [NSSet setWithObject:self.targetClientId];
+                //NSSet *clientId = [NSSet setWithObject:self.targetClientId];
                 msgId = [[[HXIMManager manager] anIM] sendBinary:thumbnailData
                                                         fileType:@"image"
                                                       customData:customData
-                                                       toClients:clientId
+                                                        toClient:self.targetClientId
                                                   needReceiveACK:YES];
             }else{
                 msgId = [[[HXIMManager manager] anIM] sendBinary:thumbnailData
@@ -1015,15 +1177,16 @@
 - (void)sendVoiceData:(NSData *)voice
 {
     NSString *msgId;
-    NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"您收到來自 %@ 的聲音訊息", nil),self.currentUserName];
+    NSString *notificationAlert = [NSString stringWithFormat:NSLocalizedString(@"%@_sent_you_a_voice_message", nil),self.currentUserName];
     NSDictionary *customData = @{@"name":self.currentUserName,
-                                 @"notification_alert":notificationAlert};
+                                 @"notification_alert":notificationAlert,
+                                 @"photoUrl":[HXUserAccountManager manager].photoUrl};
     if (!self.isTopicMode) {
-        NSSet *clientId = [NSSet setWithObject:self.targetClientId];
+        //NSSet *clientId = [NSSet setWithObject:self.targetClientId];
         msgId = [[[HXIMManager manager] anIM] sendBinary:voice
                                                 fileType:@"record"
                                               customData:customData
-                                               toClients:clientId
+                                                toClient:self.targetClientId
                                           needReceiveACK:YES];
     }else{
         msgId = [[[HXIMManager manager] anIM] sendBinary:voice
@@ -1052,7 +1215,7 @@
     }else{
         [MessageUtil saveTopicMessageIntoDB:@[customMessage]];
     }
-
+    
 }
 
 #pragma mark Custom Message Object
@@ -1102,7 +1265,7 @@
             [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
         }
     });
-
+    
 }
 
 - (void)addTimeMessageWithTimestamp:(NSNumber *)timestamp
@@ -1179,8 +1342,9 @@
                                              target:self
                                              action:nil];
         }else{
+            
             self.navigationController.navigationBar.backItem.backBarButtonItem
-            =[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"返回", nil)
+            =[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil)
                                               style:UIBarButtonItemStylePlain
                                              target:self
                                              action:nil];
@@ -1261,7 +1425,7 @@
                                     ,self.chatInfo.messages]];
     }else{
         [fetchRequest setPredicate:[NSPredicate predicateWithFormat
-                                    :@"chat.topicId == %@",self.chatInfo.topicId]];
+                                    :@"chat.topicId == %@ && chat.currentUserName == %@",self.chatInfo.topicId,[HXUserAccountManager manager].userName]];
     }
     [fetchRequest setEntity:entity];
     
@@ -1310,5 +1474,26 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)fetchUserInfoWithId:(NSString*)userId{
+    [[HXAnSocialManager manager]sendRequest:@"users/get.json"
+                                     method:AnSocialManagerGET
+                                     params:@{@"user_ids":userId}
+                                    success:^(NSDictionary *response){
+                                        NSLog(@"Got user info :%@",userId);
+                                        NSDictionary *userInfo = response[@"response"][@"users"][0];
+                                        [UserUtil saveUserIntoDB:userInfo];
+                                        [self.tableView reloadData];
+                                        //add notification
+                                        //[[NSNotificationCenter defaultCenter] postNotificationName:DidUserUpdated object:nil];
+                                        
+                                    } failure:^(NSDictionary *response){
+                                        
+                                        NSLog(@"fail to get user info !!!!");
+                                        
+                                    }];
+}
 
+-(void)updateUserPhoto{
+    [self fetchChatHistory];
+}
 @end

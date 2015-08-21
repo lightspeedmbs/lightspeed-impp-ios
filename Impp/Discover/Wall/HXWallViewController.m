@@ -16,6 +16,8 @@
 #import "HXCreatePostViewController.h"
 #import "HXPost+Additions.h"
 #import "HXImageDetailViewController.h"
+#import "HXIMManager.h"
+#import "ChatUtil.h"
 
 #import "LightspeedCredentials.h"
 
@@ -48,6 +50,8 @@
 @property BOOL noMoreToLoad;
 @property int pageNum;
 @property BOOL m_bRefreshing;
+
+@property BOOL isAnRoomMode;
 @end
 
 @implementation HXWallViewController
@@ -55,8 +59,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.friendUserIdList = [[HXAnSocialManager manager]getFriendUserIds];
-    [self fetchPostFromDB];
+        self.friendUserIdList = [[HXAnSocialManager manager]getFriendUserIds];
+        [self fetchPostFromDB];
+   
+    
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(fetchWallData:) name:RefreshWall object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateLike:) name:UpdateLike object:nil];
 }
@@ -90,7 +96,7 @@
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-
+    
 }
 
 - (void)dealloc{
@@ -106,6 +112,21 @@
         self.wallInfo = wallInfo;
         self.contentOffsetDictionary = [NSMutableDictionary dictionary];
         self.hidesBottomBarWhenPushed = YES;
+        self.isAnRoomMode = NO;
+        [self initView];
+        [self initNavigationBar];
+    }
+    
+    return self;
+}
+- (id)initWithWallInfoInGroupMode:(NSMutableDictionary *)wallInfo
+{
+    self = [super init];
+    if (self) {
+        self.wallInfo = wallInfo;
+        self.contentOffsetDictionary = [NSMutableDictionary dictionary];
+        self.hidesBottomBarWhenPushed = YES;
+        self.isAnRoomMode = YES;
         [self initView];
         [self initNavigationBar];
     }
@@ -113,10 +134,14 @@
     return self;
 }
 
+
+
+
 - (void)initView
 {
-    self.postArray = [[NSMutableArray alloc]initWithCapacity:0];
     
+    
+    self.postArray = [[NSMutableArray alloc]initWithCapacity:0];
     self.view.backgroundColor = [UIColor color5];
     
     /* tableView */
@@ -144,44 +169,65 @@
     self.headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0,SCREEN_WIDTH , 104)];
     self.headerView.backgroundColor = [UIColor color1];
     
-    self.photoImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"friend_default"]];
-    self.photoImageView.frame = CGRectMake((SCREEN_WIDTH - 54)/2, 15, 54, 54);
+    self.photoImageView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 54)/2, 15, 54, 54)];
     self.photoImageView.layer.cornerRadius = 54/2;
     self.photoImageView.clipsToBounds = YES;
     self.photoImageView.userInteractionEnabled = YES;
+    self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
+    self.photoImageView.backgroundColor = [UIColor color6];
+    self.photoImageView.image = [UIImage imageNamed:@"friend_default"];
     [self.headerView addSubview:self.photoImageView];
-    
-    if (![[HXUserAccountManager manager].userInfo.photoURL isEqualToString:@""]){
-        SDWebImageManager *manager = [SDWebImageManager sharedManager];
-        [manager downloadWithURL:[NSURL URLWithString:[HXUserAccountManager manager].userInfo.photoURL]
-                         options:0
-                        progress:^(NSInteger receivedSize, NSInteger expectedSize){}
-                       completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished){
-                           if (image) {
-                               self.photoImageView.image = image;
-                               self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
-                           }
-                           
-                       }];
-    }
     
     self.userNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,
                                                                    self.photoImageView.frame.size.height + self.photoImageView.frame.origin.y + 6,SCREEN_WIDTH, 16)];
     [self.userNameLabel setBackgroundColor:[UIColor clearColor]];
     [self.userNameLabel setFont:[UIFont fontWithName:@"STHeitiTC-Medium" size:16]];
     [self.userNameLabel setTextColor:[UIColor whiteColor]];
-    self.userNameLabel.text = [HXUserAccountManager manager].userInfo.userName;
+    
     self.userNameLabel.textAlignment = NSTextAlignmentCenter;
     [self.headerView addSubview:self.userNameLabel];
-   
+    
+    
+    self.userNameLabel.text = [HXUserAccountManager manager].userName;
+    if (![[HXUserAccountManager manager].userInfo.photoURL isEqualToString:@""]){
+            SDWebImageManager *manager = [SDWebImageManager sharedManager];
+            [manager downloadWithURL:[NSURL URLWithString:[HXUserAccountManager manager].userInfo.photoURL]
+                             options:0
+                            progress:^(NSInteger receivedSize, NSInteger expectedSize){}
+                           completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished){
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                       self.photoImageView.image = image;
+                               });
+
+                           }];
+    }
+ 
+    
+    
+
 }
 
 - (void)initNavigationBar
 {
-    [HXAppUtility initNavigationTitle:NSLocalizedString(@"朋友圈", nil) barTintColor:[UIColor color3] withViewController:self];
-
-    UIBarButtonItem *createBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(postButtonTapped)];
-    [self.navigationItem setRightBarButtonItem:createBarButton];
+    if (self.isAnRoomMode) {
+        [HXAppUtility initNavigationTitle:@"" barTintColor:[UIColor color3] withViewController:self];
+    }else{
+        [HXAppUtility initNavigationTitle:NSLocalizedString(@"timeline", nil) barTintColor:[UIColor color3] withViewController:self];
+    }
+    
+    if (self.isAnRoomMode) {
+        UIButton *button =  [UIButton buttonWithType:UIButtonTypeCustom];
+        [button setImage:[UIImage imageNamed:@"chat_barButton"] forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(chatRoomButtonTapped)forControlEvents:UIControlEventTouchUpInside];
+        [button setFrame:CGRectMake(0, 0, 22, 19)];
+        UIBarButtonItem *chatRoomBarButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+        UIBarButtonItem *createBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(postButtonTapped)];
+        [self.navigationItem setRightBarButtonItems:[NSArray arrayWithObjects:createBarButton, chatRoomBarButton,nil]];
+    }else{
+        UIBarButtonItem *createBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(postButtonTapped)];
+        [self.navigationItem setRightBarButtonItem:createBarButton];
+    }
+    
 }
 
 #pragma mark - Listener
@@ -202,10 +248,30 @@
 
 - (void)postButtonTapped
 {
-    HXCreatePostViewController *vc = [[HXCreatePostViewController alloc]init];
-    UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
-    [self presentViewController:nav animated:YES completion:nil];
+    if (_isAnRoomMode) {
+        HXCreatePostViewController *vc = [[HXCreatePostViewController alloc]initInGroupMode:_wallInfo[@"anRoomId"]];
+        UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
+        [self presentViewController:nav animated:YES completion:nil];
+    }else{
+        HXCreatePostViewController *vc = [[HXCreatePostViewController alloc]init];
+        UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
+        [self presentViewController:nav animated:YES completion:nil];
+    }
+    
+    
+}
 
+-(void)chatRoomButtonTapped{
+    HXChat *topicChatSession = [ChatUtil createChatSessionWithUser:nil
+                                                           topicId:self.wallInfo[@"topicId"]
+                                                         topicName:self.wallInfo[@"roomName"]
+                                                   currentUserName:[HXUserAccountManager manager].userInfo.userName
+                                                topicOwnerClientId:@"_ANROOM_"];
+    
+    
+    HXChatViewController *chatVc = [[HXChatViewController alloc]initInGroupModeWithChatInfo:topicChatSession setRoomInfo:_wallInfo];
+    [self.navigationController pushViewController:chatVc animated:YES];
+    
 }
 
 #pragma mark fetch Data Method
@@ -222,12 +288,12 @@
     for (int i = 0; i < self.fetchedResultsController.fetchedObjects.count; i++) {
         HXPost *hxPost = self.fetchedResultsController.fetchedObjects[i];
         NSMutableDictionary *temp = [hxPost.toDict mutableCopy];
-        [temp addEntriesFromDictionary:[hxPost.postOwner.toDict mutableCopy]];
+        temp[@"user"] = [hxPost.postOwner.toDict mutableCopy];
+
         [self.postArray addObject:temp];
-        [self.postArray addObject:hxPost.toDict];
+
         
     }
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
         [self fetchWallData:nil];
@@ -236,44 +302,46 @@
 
 - (void)fetchWallData:(NSNotification *)notice
 {
-
+    
     HXLoadingView *load = [[HXLoadingView alloc]initLoadingView];
     
     self.pageNum = 1;
     self.noMoreToLoad = NO;
-    NSDictionary *params = @{@"wall_id":LIGHTSPEED_WALL_ID,
-                             @"page":[NSNumber numberWithInt:_pageNum],
-                             @"limit":@POST_PAGE_SIZE,
-                             @"sort": @"-created_at",
-                             @"user_id":self.friendUserIdList};
-
+    NSString *wallid;
+    NSDictionary *params;
     
+    wallid = LIGHTSPEED_WALL_ID;
+    params = @{@"wall_id":wallid,
+               @"page":[NSNumber numberWithInt:_pageNum],
+               @"limit":@POST_PAGE_SIZE,
+               @"sort": @"-created_at",
+               @"user_id":self.friendUserIdList};
+
     [[HXAnSocialManager manager]sendRequest:@"posts/query.json" method:AnSocialManagerGET params:params success:^(NSDictionary *response){
         
-        NSLog(@"fetch data :%@",[response description]);
-        [self.postArray removeAllObjects];
-        NSMutableArray *newPosts = [response[@"response"][@"posts"] mutableCopy];
-        if (newPosts.count) {
-            self.pageNum++;
-            [self fetchLikes:newPosts];
-            
-            for (NSDictionary *post in newPosts){
-                HXPost* hxPost = [PostUtil savePostToDB:post];
-                NSMutableDictionary *temp = [hxPost.toDict mutableCopy];
-                [temp addEntriesFromDictionary:[hxPost.postOwner.toDict mutableCopy]];
-                [self.postArray addObject:temp];
-            }
-            
-            //[self.postArray addObjectsFromArray:newPosts];
-            
-            if (newPosts.count < POST_PAGE_SIZE) self.noMoreToLoad = YES;
-        }else
-            self.noMoreToLoad = YES;
-        
-        
         dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"fetch data :%@",[response description]);
+            [self.postArray removeAllObjects];
+            NSMutableArray *newPosts = [response[@"response"][@"posts"] mutableCopy];
+            if (newPosts.count) {
+                self.pageNum++;
+                [self fetchLikes:newPosts];
+                
+                for (NSDictionary *post in newPosts){
+                    HXPost* hxPost = [PostUtil savePostToDB:post];
+                    NSMutableDictionary *temp = [hxPost.toDict mutableCopy];
+                    temp[@"user"] = [hxPost.postOwner.toDict mutableCopy];
+                    //[temp addEntriesFromDictionary:[hxPost.postOwner.toDict mutableCopy]];
+                    [self.postArray addObject:temp];
+                }
+                
+                //[self.postArray addObjectsFromArray:newPosts];
+                
+                if (newPosts.count < POST_PAGE_SIZE) self.noMoreToLoad = YES;
+            }else
+                self.noMoreToLoad = YES;
             [load removeFromSuperview];
-            
+
             [self.refreshControl endRefreshing];
             [self.tableView reloadData];
         });
@@ -287,37 +355,43 @@
 
 - (void)loadMoreWallData
 {
-    NSDictionary *params = @{@"wall_id":LIGHTSPEED_WALL_ID,
-                             @"page":[NSNumber numberWithInt:_pageNum],
-                             @"limit":@POST_PAGE_SIZE,
-                             @"sort": @"-created_at",
-                             @"user_id":self.friendUserIdList};
+    NSString *wallid;
+    NSDictionary *params;
+    
+    wallid = LIGHTSPEED_WALL_ID;
+    params = @{@"wall_id":wallid,
+               @"page":[NSNumber numberWithInt:_pageNum],
+               @"limit":@POST_PAGE_SIZE,
+               @"sort": @"-created_at",
+               @"user_id":self.friendUserIdList};
+
     
     [[HXAnSocialManager manager]sendRequest:@"posts/query.json" method:AnSocialManagerGET params:params success:^(NSDictionary *response){
-        
-        NSLog(@"fetch data :%@",[response description]);
-        self.isLoadingMore = NO;
-        
-        NSMutableArray *newPosts = [response[@"response"][@"posts"] mutableCopy];
-        if (newPosts.count) {
-            self.pageNum++;
-            [self fetchLikes:newPosts];
-            
-            for (NSDictionary *post in newPosts){
-                HXPost* hxPost = [PostUtil savePostToDB:post];
-                NSMutableDictionary *temp = [hxPost.toDict mutableCopy];
-                [temp addEntriesFromDictionary:[hxPost.postOwner.toDict mutableCopy]];
-                [self.postArray addObject:temp];
-            }
-            //[self.postArray addObjectsFromArray:newPosts];
-            
-        }else
-            self.noMoreToLoad = YES;
-        
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"fetch data :%@",[response description]);
+            self.isLoadingMore = NO;
+            
+            NSMutableArray *newPosts = [response[@"response"][@"posts"] mutableCopy];
+            if (newPosts.count) {
+                self.pageNum++;
+                [self fetchLikes:newPosts];
+                
+                for (NSDictionary *post in newPosts){
+                    HXPost* hxPost = [PostUtil savePostToDB:post];
+                    NSMutableDictionary *temp = [hxPost.toDict mutableCopy];
+                    temp[@"user"] = [hxPost.postOwner.toDict mutableCopy];
+
+                    [self.postArray addObject:temp];
+                }
+
+            }else
+                self.noMoreToLoad = YES;
+
             [self.tableView reloadData];
         });
+        
+
         
     } failure:^(NSDictionary *response){
         self.isLoadingMore = NO;
@@ -485,7 +559,7 @@
     }
     
     static NSString *cellIdentifier = @"postCell";
-
+    
     HXPostTableViewCell *cell = [[HXPostTableViewCell alloc]initWithPostInfo:self.postArray[indexPath.row] reuseIdentifier:cellIdentifier];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.backgroundColor = [UIColor clearColor];
@@ -584,8 +658,8 @@
     
     [fetchRequest setIncludesPropertyValues:NO];
     [fetchRequest setPredicate:[NSPredicate predicateWithFormat
-                                :@"postOwner IN %@ || postOwner == %@"
-                                ,[HXUserAccountManager manager].userInfo.friends,[HXUserAccountManager manager].userInfo]];
+                                :@"(postOwner IN %@ || postOwner == %@) && parentId == %@"
+                                ,[HXUserAccountManager manager].userInfo.friends,[HXUserAccountManager manager].userInfo,LIGHTSPEED_WALL_ID]];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -627,4 +701,11 @@
     
     return;
 }
+
+
+- (BOOL) isObjectAvailable:(id) data {
+    return ((data != nil) && ![data isKindOfClass:[NSNull class]]);
+}
+
+
 @end

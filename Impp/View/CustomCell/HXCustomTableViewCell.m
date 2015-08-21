@@ -21,7 +21,7 @@
 @property (strong, nonatomic) NSString *title;
 @property (strong, nonatomic) NSString *photoUrl;
 @property (strong, nonatomic) UIImage *image;
-@property (strong, nonatomic) UILabel *statusLabel;
+
 @property (strong, nonatomic) HXNumberBadge *badge;
 @property (strong, nonatomic) HXCustomButton *friendSearchButton;
 @property (nonatomic) HXCustomCellStyle customStyle;
@@ -77,7 +77,7 @@
     
     if (self.customStyle == HXCustomCellStyleSearch) {
         
-        self.friendSearchButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"加入好友", nil) titleColor:[UIColor color3] backgroundColor:[UIColor color5]];
+        self.friendSearchButton = [[HXCustomButton alloc]initWithTitle:NSLocalizedString(@"Add", nil) titleColor:[UIColor color3] backgroundColor:[UIColor color5]];
         [self.friendSearchButton addTarget:self action:@selector(customButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
         CGRect bframe = self.friendSearchButton.frame;
         bframe.origin.x = SCREEN_WIDTH - 15 - bframe.size.width;
@@ -86,7 +86,7 @@
         [self addSubview:self.friendSearchButton];
         
         self.statusLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH - 15, self.frame.size.height)];
-        self.statusLabel.text = NSLocalizedString(@"已是好友", nil);
+        self.statusLabel.text = NSLocalizedString(@"already_friends", nil);
         self.statusLabel.textAlignment = NSTextAlignmentRight;
         self.statusLabel.textColor = [UIColor color8];
         self.statusLabel.font = [UIFont fontWithName:@"STHeitiTC-Light" size:13];

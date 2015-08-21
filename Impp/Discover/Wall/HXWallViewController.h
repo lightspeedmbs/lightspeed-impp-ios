@@ -11,4 +11,5 @@
 @interface HXWallViewController : UIViewController
 
 - (id)initWithWallInfo:(NSMutableDictionary *)wallInfo;
+- (id)initWithWallInfoInGroupMode:(NSMutableDictionary *)wallInfo;
 @end
